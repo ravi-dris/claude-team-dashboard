@@ -144,15 +144,66 @@ tr:hover td{background:#1e2130;}
     <div class="kpi" style="border-color:rgba(239,68,68,.3)"><div class="lbl">Inactive Members</div><div class="val" id="kInactive" style="color:var(--red)">0</div><div class="sub dn" id="kInactiveSub">No activity this period</div></div>
   </div>
 
-  <div class="two-col" style="margin-top:16px;">
-    <div class="inactive-panel">
-      <div class="inactive-hdr"><h3><span class="ibadge zero" id="iBadge">0</span> Inactive Members</h3><span id="iPanelSub">No activity in last 14 days</span></div>
-      <div id="iList"></div>
+  <div class="sec">Key Insights</div>
+  <div class="insight-grid">
+
+    <div class="chart-card" style="border-top:3px solid var(--green);">
+      <div style="font-size:11px;color:var(--green);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Adoption Health</div>
+      <h3 style="font-size:16px;color:#fff;margin-bottom:12px;">AI is a daily work tool, not an experiment</h3>
+      <div style="line-height:1.9;color:var(--muted);font-size:13px;">
+        The team sends <strong style="color:var(--text)">242 prompts every working day</strong>. Even on weekends — 157 conversations happened on Saturdays and Sundays, 10% of total volume — showing AI has embedded into how people work, not just office hours.<br><br>
+        <strong style="color:var(--text)">19 of 21 members</strong> were active in the last 30 days. Both team leads (Ravi and Ankit) are in the top 5 users, signalling cultural buy-in from the top down.
+      </div>
     </div>
-    <div class="chart-card" style="display:flex;flex-direction:column;gap:14px;">
-      <div><h3>Seat Utilisation</h3><p>Active vs inactive seats for selected filters</p></div>
-      <canvas id="utilChart" style="max-height:210px;"></canvas>
+
+    <div class="chart-card" style="border-top:3px solid var(--blue);">
+      <div style="font-size:11px;color:var(--blue);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Usage Archetypes</div>
+      <h3 style="font-size:16px;color:#fff;margin-bottom:12px;">Three distinct working styles have emerged</h3>
+      <div style="line-height:1.9;color:var(--muted);font-size:13px;">
+        <strong style="color:var(--text)">Deep collaborators</strong> — Ravi (16 msgs/session), Kashish (29), Ankit (11.5) — use AI for complex, iterative problem solving over hours.<br><br>
+        <strong style="color:var(--text)">Volume users</strong> — Aastha (302 convs), Sachin (257), Abhinav (112) — treat AI as an always-on daily assistant.<br><br>
+        <strong style="color:var(--text)">Silent coders</strong> — Abhijit (165K lines, 3 chats), Samarth (168K lines, 30 chats) — minimal chat but massive code output; they've replaced manual coding with AI.
+      </div>
     </div>
+
+    <div class="chart-card" style="border-top:3px solid var(--orange);">
+      <div style="font-size:11px;color:var(--orange);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Client Impact</div>
+      <h3 style="font-size:16px;color:#fff;margin-bottom:12px;">AI is directly inside client deliverables</h3>
+      <div style="line-height:1.9;color:var(--muted);font-size:13px;">
+        This is not internal experimentation — real client work is AI-assisted:<br><br>
+        <strong style="color:var(--text)">Services:</strong> CRISIL data migration, Landmark patient vitals, ADG census mapping, farmer Aadhaar procurement workflow.<br><br>
+        <strong style="color:var(--text)">Product:</strong> NASSCOM Foundation portal testing, Bajaj Auto V2→V3 migration, JSL dashboard, TRI NUO data pipeline.
+      </div>
+    </div>
+
+    <div class="chart-card" style="border-top:3px solid var(--purple);">
+      <div style="font-size:11px;color:var(--purple);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Productivity ROI</div>
+      <h3 style="font-size:16px;color:#fff;margin-bottom:12px;">Code generation grew 74% in a single month</h3>
+      <div style="line-height:1.9;color:var(--muted);font-size:13px;">
+        Combined code lines: <strong style="color:var(--text)">715K (April) → 1.24M (May)</strong> — a 74% jump at 99.8% acceptance, meaning virtually every AI-written line went straight to production.<br><br>
+        At 30 lines/developer-hour, the team's <strong style="color:var(--text)">2.06M lines = ~68,700 hours</strong> of equivalent manual coding — delivered in 63 days by 17 developers.
+      </div>
+    </div>
+
+    <div class="chart-card" style="border-top:3px solid #06b6d4;">
+      <div style="font-size:11px;color:#06b6d4;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Team Comparison</div>
+      <h3 style="font-size:16px;color:#fff;margin-bottom:12px;">Product analyses. Services builds.</h3>
+      <div style="line-height:1.9;color:var(--muted);font-size:13px;">
+        <strong style="color:var(--blue)">Product</strong> drives 88% more conversations (1,189 vs 631) at 7.5 msgs/session — AI used for testing, SQL debugging, data analysis, stakeholder reporting.<br><br>
+        <strong style="color:var(--orange)">Services</strong> generates 30% more code (1.16M vs 896K) at 5.3 msgs/session — AI used for migrations, API integrations, DevOps, and technical delivery.
+      </div>
+    </div>
+
+    <div class="chart-card" style="border-top:3px solid var(--red);">
+      <div style="font-size:11px;color:var(--red);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Attention Needed</div>
+      <h3 style="font-size:16px;color:#fff;margin-bottom:12px;">Two seats not delivering ROI yet</h3>
+      <div style="line-height:1.9;color:var(--muted);font-size:13px;">
+        <strong style="color:var(--text)">Sushant Singh</strong> (Services · Standard) — last active May 1, 26 convs, 0 code lines. Role in AI workflows is unclear.<br><br>
+        <strong style="color:var(--text)">Navneet Patteri</strong> (Services · Premium) — 6 conversations, 0 code lines in 63 days. A Premium seat at this level is an opportunity to activate or reassign.<br><br>
+        Recommendation: 30-min use-case session with both within 2 weeks.
+      </div>
+    </div>
+
   </div>
 
   <div class="sec" id="codeSec">Claude Code Highlights — All Time · Both Teams</div>
@@ -189,66 +240,16 @@ tr:hover td{background:#1e2130;}
     </table>
   </div>
 
-  <div class="sec">Key Insights</div>
-  <div class="insight-grid">
-
-    <div class="chart-card" style="border-top:3px solid var(--green);">
-      <div style="font-size:11px;color:var(--green);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Adoption Health</div>
-      <h3 style="font-size:16px;color:#fff;margin-bottom:12px;">AI is a daily work tool, not an experiment</h3>
-      <div style="line-height:1.9;color:var(--muted);font-size:13px;">
-        The team sends <strong style="color:var(--text)">242 prompts every working day</strong>. Even on weekends — 157 conversations happened on Saturdays and Sundays, 10% of total volume — showing AI has embedded into how people work, not just office hours.<br><br>
-        <strong style="color:var(--text)">19 of 21 members</strong> were active in the last 30 days. Both team leads (Ravi and Ankit) are in the top 5 users, which signals cultural buy-in from the top down.
-      </div>
+  <div class="sec">Inactive Members & Seat Utilisation</div>
+  <div class="two-col">
+    <div class="inactive-panel">
+      <div class="inactive-hdr"><h3><span class="ibadge zero" id="iBadge">0</span> Inactive Members</h3><span id="iPanelSub">No activity in last 14 days</span></div>
+      <div id="iList"></div>
     </div>
-
-    <div class="chart-card" style="border-top:3px solid var(--blue);">
-      <div style="font-size:11px;color:var(--blue);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Usage Archetypes</div>
-      <h3 style="font-size:16px;color:#fff;margin-bottom:12px;">Three distinct working styles have emerged</h3>
-      <div style="line-height:1.9;color:var(--muted);font-size:13px;">
-        <strong style="color:var(--text)">Deep collaborators</strong> — Ravi (16 msgs/session), Kashish (29 msgs/session), Ankit (11.5) — use AI for complex, back-and-forth problem solving over hours.<br><br>
-        <strong style="color:var(--text)">Volume users</strong> — Aastha (302 convs), Sachin (257), Abhinav (112) — treat AI as an always-on assistant for daily task execution.<br><br>
-        <strong style="color:var(--text)">Silent coders</strong> — Abhijit (165K lines, 3 chats), Samarth (168K lines, 30 chats) — rarely use chat but generate massive code output; they've replaced manual coding with AI-driven development.
-      </div>
+    <div class="chart-card" style="display:flex;flex-direction:column;gap:14px;">
+      <div><h3>Seat Utilisation</h3><p>Active vs inactive seats for selected filters</p></div>
+      <canvas id="utilChart" style="max-height:210px;"></canvas>
     </div>
-
-    <div class="chart-card" style="border-top:3px solid var(--orange);">
-      <div style="font-size:11px;color:var(--orange);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Client Impact</div>
-      <h3 style="font-size:16px;color:#fff;margin-bottom:12px;">AI is directly inside client deliverables</h3>
-      <div style="line-height:1.9;color:var(--muted);font-size:13px;">
-        This is not internal experimentation. Real client work is AI-assisted:<br><br>
-        <strong style="color:var(--text)">Services:</strong> CRISIL data migration, Landmark patient vitals migration, ADG census mapping, farmer procurement workflow with Aadhaar verification.<br><br>
-        <strong style="color:var(--text)">Product:</strong> NASSCOM Foundation portal testing, Bajaj Auto V2→V3 migration, JSL dashboard integration, TRI NUO data pipeline — all led through AI-assisted sessions.
-      </div>
-    </div>
-
-    <div class="chart-card" style="border-top:3px solid var(--purple);">
-      <div style="font-size:11px;color:var(--purple);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Productivity ROI</div>
-      <h3 style="font-size:16px;color:#fff;margin-bottom:12px;">Code generation grew 74% in a single month</h3>
-      <div style="line-height:1.9;color:var(--muted);font-size:13px;">
-        Combined code lines: <strong style="color:var(--text)">715K (April) → 1.24M (May)</strong> — a 74% jump, with a 99.8% acceptance rate meaning virtually every AI-written line went straight to production.<br><br>
-        At a conservative estimate of 30 lines/developer-hour, the team's <strong style="color:var(--text)">2.06M lines represents ~68,700 hours</strong> of equivalent manual coding work — accomplished in 63 days by 17 developers.
-      </div>
-    </div>
-
-    <div class="chart-card" style="border-top:3px solid #06b6d4;">
-      <div style="font-size:11px;color:#06b6d4;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Team Comparison</div>
-      <h3 style="font-size:16px;color:#fff;margin-bottom:12px;">Product analyses, Services builds</h3>
-      <div style="line-height:1.9;color:var(--muted);font-size:13px;">
-        Two teams, two strategies. <strong style="color:var(--blue)">Product</strong> drives 88% more conversations (1,189 vs 631) with deeper sessions — AI is used for testing, data analysis, SQL debugging, and stakeholder documentation.<br><br>
-        <strong style="color:var(--orange)">Services</strong> generates 30% more code lines (1.16M vs 896K) — AI is used for database migrations, API integrations, DevOps, and technical client delivery. Services produces more output per member per conversation.
-      </div>
-    </div>
-
-    <div class="chart-card" style="border-top:3px solid var(--red);">
-      <div style="font-size:11px;color:var(--red);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Attention Needed</div>
-      <h3 style="font-size:16px;color:#fff;margin-bottom:12px;">Two seats not delivering ROI yet</h3>
-      <div style="line-height:1.9;color:var(--muted);font-size:13px;">
-        <strong style="color:var(--text)">Sushant Singh</strong> (Services, Standard seat) — last active May 1, 26 total conversations in 2 months, 0 code lines. Unclear what role he plays in AI workflows.<br><br>
-        <strong style="color:var(--text)">Navneet Patteri</strong> (Services, Premium seat) — only 6 conversations and 0 code lines across 63 days. A Premium seat at this usage level represents an opportunity to either activate or reassign.<br><br>
-        Recommendation: a 30-minute use-case session with both members within the next 2 weeks.
-      </div>
-    </div>
-
   </div>
 
 </div>
