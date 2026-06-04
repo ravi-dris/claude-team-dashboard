@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dhwani RIS — Claude AI Usage Report</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg:#0f1117; --card:#1a1d27; --card2:#212536; --border:#2e3248;
+  --accent:#6b8afd; --accent2:#f97316; --green:#22c55e; --red:#ef4444;
+  --text:#e2e8f0; --muted:#8892aa; --font:'Segoe UI',system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;}
+
+.header{background:linear-gradient(135deg,#1a1d27,#212536);border-bottom:1px solid var(--border);padding:28px 40px;display:flex;justify-content:space-between;align-items:center;}
+.header h1{font-size:22px;font-weight:700;color:#fff;}
+.header h1 span{color:var(--accent);}
+.meta{text-align:right;color:var(--muted);font-size:13px;line-height:1.8;}
+.meta strong{color:var(--text);}
+
+.filter-bar{background:var(--card);border-bottom:1px solid var(--border);padding:14px 40px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;}
+.filter-label{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.8px;text-transform:uppercase;margin-right:4px;}
+.filter-btn{padding:7px 18px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:13px;font-family:var(--font);font-weight:500;transition:all .15s;}
+.filter-btn:hover{border-color:var(--accent);color:var(--text);}
+.filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600;}
+.filter-note{margin-left:auto;font-size:12px;color:var(--muted);}
+.filter-note b{color:var(--accent);}
+
+.container{max-width:1400px;margin:0 auto;padding:32px 40px;}
+.sec{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin:36px 0 16px;display:flex;align-items:center;gap:10px;}
+.sec::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 22px;}
+.kpi .lbl{font-size:12px;color:var(--muted);margin-bottom:8px;}
+.kpi .val{font-size:28px;font-weight:700;color:#fff;line-height:1;margin-bottom:6px;}
+.kpi .sub{font-size:12px;}
+.up{color:var(--green);} .dn{color:var(--red);} .neu{color:var(--muted);}
+
+.hl-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.hl{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:12px;padding:20px 22px;}
+.hl.or{border-left-color:var(--accent2);} .hl.gr{border-left-color:var(--green);} .hl.pu{border-left-color:#a855f7;}
+.hl .hl-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;}
+.hl .hl-val{font-size:22px;font-weight:700;color:#fff;margin-bottom:4px;}
+.hl .hl-sub{font-size:12px;color:var(--muted);}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;}
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;}
+.chart-card h3{font-size:14px;font-weight:600;margin-bottom:4px;}
+.chart-card p{font-size:12px;color:var(--muted);margin-bottom:20px;}
+.chart-card canvas{max-height:260px;}
+
+/* Inactive panel */
+.inactive-panel{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.inactive-hdr{padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.inactive-hdr h3{font-size:14px;font-weight:600;display:flex;align-items:center;gap:10px;}
+.ibadge{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(239,68,68,.15);color:var(--red);font-size:12px;font-weight:700;}
+.ibadge.zero{background:rgba(34,197,94,.12);color:var(--green);}
+.inactive-hdr span{font-size:12px;color:var(--muted);}
+.iitem{display:flex;align-items:center;padding:14px 24px;border-bottom:1px solid #1e2130;gap:14px;}
+.iitem:last-child{border-bottom:none;}
+.iitem:hover{background:#1e2130;}
+.idays{margin-left:auto;text-align:right;}
+.idays .dnum{font-size:18px;font-weight:700;}
+.idays .dnum.crit{color:var(--red);} .idays .dnum.warn{color:var(--accent2);} .idays .dnum.ok{color:var(--muted);}
+.idays .dlbl{font-size:11px;color:var(--muted);}
+.last-seen{font-size:12px;color:var(--muted);margin-top:2px;}
+.all-ok{padding:28px 24px;text-align:center;color:var(--green);font-size:13px;}
+
+/* Table */
+.tbl-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.tbl-hdr{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.tbl-hdr h3{font-size:14px;font-weight:600;}
+table{width:100%;border-collapse:collapse;}
+th{text-align:left;font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);padding:10px 24px;background:#1e2130;border-bottom:1px solid var(--border);}
+td{padding:12px 24px;font-size:13px;border-bottom:1px solid #1e2130;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#1e2130;}
+
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;}
+.bp{background:rgba(107,138,253,.15);color:var(--accent);}
+.bs{background:rgba(249,115,22,.12);color:var(--accent2);}
+.bo{background:rgba(34,197,94,.12);color:var(--green);}
+.ba{background:rgba(34,197,94,.1);color:var(--green);}
+.bi{background:rgba(239,68,68,.1);color:var(--red);}
+
+.pb-wrap{display:flex;align-items:center;gap:10px;}
+.pb{height:6px;background:var(--border);border-radius:3px;flex:1;overflow:hidden;}
+.pb .fill{height:100%;border-radius:3px;background:var(--accent);}
+.num{font-size:13px;color:var(--muted);min-width:36px;text-align:right;}
+
+.rk{width:24px;height:24px;border-radius:6px;background:var(--card2);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--muted);}
+.rk.g{background:rgba(250,204,21,.15);color:#facc15;} .rk.s{background:rgba(148,163,184,.15);color:#94a3b8;} .rk.b{background:rgba(180,83,9,.15);color:#b45309;}
+.av{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700;margin-right:8px;flex-shrink:0;}
+.uc{display:flex;align-items:center;}
+.ue{font-size:12px;color:var(--muted);}
+.nd{color:var(--muted);font-style:italic;}
+.code-note{background:rgba(107,138,253,.08);border:1px solid rgba(107,138,253,.2);border-radius:8px;padding:10px 16px;font-size:12px;color:var(--muted);margin-bottom:16px;}
+
+.footer{text-align:center;padding:32px 40px;color:var(--muted);font-size:12px;border-top:1px solid var(--border);margin-top:40px;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:6px;letter-spacing:1px;text-transform:uppercase;">Dhwani Rural Information Systems</div>
+    <h1>Claude AI Usage <span>Dashboard</span></h1>
+    <div style="font-size:13px;color:var(--muted);margin-top:4px;" id="hSub">Apr 2 – Jun 4, 2026 · All Months</div>
+  </div>
+  <div class="meta">
+    <div><strong>Prepared for:</strong> Ravi Jangir, Strategy &amp; Ops</div>
+    <div><strong>Report Date:</strong> June 4, 2026</div>
+    <div><strong>Team Size:</strong> 10 members &nbsp;|&nbsp; <strong>Plan:</strong> Claude Team</div>
+    <div style="margin-top:6px;padding:4px 10px;background:rgba(107,138,253,.12);border-radius:6px;display:inline-block;color:var(--accent);font-size:12px;" id="hTag">63-day snapshot</div>
+  </div>
+</div>
+
+<div class="filter-bar">
+  <span class="filter-label">Filter by Month</span>
+  <button class="filter-btn active" id="btn-all"     onclick="go('all')">All Time</button>
+  <button class="filter-btn"        id="btn-2026-04" onclick="go('2026-04')">April 2026</button>
+  <button class="filter-btn"        id="btn-2026-05" onclick="go('2026-05')">May 2026</button>
+  <button class="filter-btn"        id="btn-2026-06" onclick="go('2026-06')">June 2026 <span style="font-size:11px;opacity:.7">(1–4)</span></button>
+  <div class="filter-note">Showing: <b id="fNote">All Time · Apr 2 – Jun 4, 2026</b></div>
+</div>
+
+<div class="container">
+
+  <div class="sec">Overall Performance</div>
+  <div class="kpi-grid">
+    <div class="kpi"><div class="lbl">Total Conversations</div><div class="val" id="kConvs">1,189</div><div class="sub neu" id="kConvsSub">Apr 2 – Jun 4, 2026</div></div>
+    <div class="kpi"><div class="lbl">Messages Sent</div><div class="val" id="kMsgs">8,968</div><div class="sub neu" id="kMsgsSub">Human prompts</div></div>
+    <div class="kpi"><div class="lbl">AI Responses</div><div class="val" id="kResp">9,037</div><div class="sub up">↑ 99.2% response rate</div></div>
+    <div class="kpi"><div class="lbl">Active Members</div><div class="val" id="kUsers">10</div><div class="sub up" id="kUsersSub">10 of 10 members active</div></div>
+    <div class="kpi" style="border-color:rgba(239,68,68,.3)"><div class="lbl">Inactive Members</div><div class="val" id="kInactive" style="color:var(--red)">0</div><div class="sub dn" id="kInactiveSub">No activity this period</div></div>
+  </div>
+
+  <!-- Inactive panel -->
+  <div class="two-col" style="margin-top:20px;">
+    <div class="inactive-panel">
+      <div class="inactive-hdr">
+        <h3><span class="ibadge" id="iBadge">0</span> Inactive Members</h3>
+        <span id="iPanelSub">No activity in selected period</span>
+      </div>
+      <div id="iList"></div>
+    </div>
+    <div class="chart-card" style="display:flex;flex-direction:column;gap:16px;">
+      <div><h3>Seat Utilisation</h3><p>Active vs inactive seats for selected period</p></div>
+      <canvas id="utilChart" style="max-height:220px;"></canvas>
+    </div>
+  </div>
+
+  <div class="sec" id="codeSec">Claude Code Highlights — May 2026</div>
+  <div id="codeNote" class="code-note" style="display:none;"></div>
+  <div class="hl-grid">
+    <div class="hl gr"><div class="hl-lbl">Lines of Code Accepted</div><div class="hl-val">628,749</div><div class="hl-sub">AI-generated, developer-accepted</div></div>
+    <div class="hl"><div class="hl-lbl">Suggestion Accept Rate</div><div class="hl-val">99.8%</div><div class="hl-sub">Exceptionally high trust in AI output</div></div>
+    <div class="hl or"><div class="hl-lbl">Top Code Contributor</div><div class="hl-val">239,916</div><div class="hl-sub">Lines — ravi.jangir (May)</div></div>
+    <div class="hl pu"><div class="hl-lbl">Active Code Users</div><div class="hl-val">7 / 10</div><div class="hl-sub">Members using Claude Code in May</div></div>
+  </div>
+
+  <div class="sec">Activity Trends</div>
+  <div class="two-col">
+    <div class="chart-card"><h3 id="dTitle">Daily Conversations — All Time</h3><p id="dSub">Conversations per day across all team members</p><canvas id="dailyChart"></canvas></div>
+    <div class="chart-card"><h3>Monthly Volume Comparison</h3><p>Conversations and messages by month — full overview</p><canvas id="monthlyChart"></canvas></div>
+  </div>
+
+  <div class="sec">User Engagement</div>
+  <div class="two-col">
+    <div class="chart-card"><h3 id="uTitle">Conversations per User — All Time</h3><p id="uSub">Conversations per team member for selected period</p><canvas id="userConvChart"></canvas></div>
+    <div class="chart-card"><h3>Claude Code Lines — May 2026</h3><p>Lines of AI-generated code accepted per developer (May only)</p><canvas id="codeChart"></canvas></div>
+  </div>
+
+  <div class="sec">Member Activity Breakdown</div>
+  <div class="tbl-card">
+    <div class="tbl-hdr"><h3>All Team Members</h3><span id="tCaption">Sorted by conversations · All Time</span></div>
+    <table>
+      <thead><tr>
+        <th>#</th><th>Member</th><th>Role &amp; Tier</th>
+        <th>Conversations</th><th>Messages Sent</th><th>Avg Msgs/Conv</th>
+        <th>Code Lines (May)</th><th>Status</th>
+      </tr></thead>
+      <tbody id="tBody"></tbody>
+    </table>
+  </div>
+
+  <div class="sec">Key Insights</div>
+  <div class="three-col">
+    <div class="chart-card"><h3 style="color:var(--green)">✦ Strong Adoption</h3><div style="margin-top:12px;line-height:1.8;color:var(--muted);font-size:13px;">Over 63 days, the team conducted <strong style="color:var(--text)">1,189 conversations</strong> with <strong style="color:var(--text)">8,968 prompts</strong> — averaging ~19 per day. April was peak with 608 conversations across 9 active users.</div></div>
+    <div class="chart-card"><h3 style="color:var(--accent)">✦ Claude Code ROI</h3><div style="margin-top:12px;line-height:1.8;color:var(--muted);font-size:13px;">In May, <strong style="color:var(--text)">628,749 lines</strong> accepted at <strong style="color:var(--text)">99.8% acceptance rate</strong>. Abhijit Nair generated 165K lines with just 3 chat conversations — a pure code-first workflow.</div></div>
+    <div class="chart-card"><h3 style="color:var(--accent2)">✦ Opportunity: Low Engagers</h3><div style="margin-top:12px;line-height:1.8;color:var(--muted);font-size:13px;">Nihaan Mohammed (5 convs) and Sunandan (10 convs) have low usage despite Premium seats. Recommend <strong style="color:var(--text)">targeted onboarding</strong> to improve seat utilisation.</div></div>
+  </div>
+
+</div>
+
+<div class="footer">Dhwani Rural Information Systems &nbsp;|&nbsp; Claude AI Team Dashboard &nbsp;|&nbsp; Generated June 4, 2026 &nbsp;|&nbsp; Data source: claude.ai admin export</div>
+
+<script>
+// ── DATA ─────────────────────────────────────────────────────────────────────
+var MEMBERS = [
+  {name:'Aastha Arora',    email:'aastha.arora@dhwaniris.com',    ini:'AA', role:'User',          tier:'Premium'},
+  {name:'Sachin Nadge',    email:'nadge.sachin@dhwaniris.com',    ini:'SN', role:'User',          tier:'Premium'},
+  {name:'Shweta Singh',    email:'shweta.singh@dhwaniris.com',    ini:'SS', role:'User',          tier:'Premium'},
+  {name:'Banita Gautam',   email:'banita.kumari@dhwaniris.com',   ini:'BG', role:'User',          tier:'Premium'},
+  {name:'Akshat Verma',    email:'akshat.verma@dhwaniris.com',    ini:'AV', role:'User',          tier:'Standard'},
+  {name:'Arpita Jain',     email:'arpita.jain@dhwaniris.com',     ini:'AJ', role:'User',          tier:'Premium'},
+  {name:'Ravi Jangir',     email:'ravi.jangir@dhwaniris.com',     ini:'RJ', role:'Primary Owner', tier:'Premium'},
+  {name:'Sunandan',        email:'sunandan@dhwaniris.com',        ini:'SU', role:'Owner',         tier:'Premium'},
+  {name:'Nihaan Mohammed', email:'nihaan.mohammed@dhwaniris.com', ini:'NM', role:'User',          tier:'Premium'},
+  {name:'Abhijit Nair',    email:'abhijit.nair@dhwaniris.com',    ini:'AB', role:'User',          tier:'Premium'}
+];
+
+var CONVS = {
+  'all':     [302, 257, 202, 124, 110, 103,  59, 10,  5,  3],
+  '2026-04': [229,  37, 119,  54,  47,  68,  27, 10,  3,  0],
+  '2026-05': [ 69, 207,  73,  67,  56,  29,  26,  0,  2,  3],
+  '2026-06': [  4,  13,  10,   3,   7,   6,   6,  0,  0,  0]
+};
+var MSGS = {
+  'all':     [1771, 1107, 2144, 1093, 921, 822, 944, 75, 11,  14],
+  '2026-04': [1423,  226, 1326,  576, 412, 608, 678, 75,  8,   0],
+  '2026-05': [ 343,  833,  761,  505, 449, 157, 257,  0,  3,  14],
+  '2026-06': [   5,   48,   57,   12,  60,  57,   9,  0,  0,   0]
+};
+// Claude Code lines — May only (index matches MEMBERS)
+var CODE = [0, 105082, 9320, 57984, 4769, 45798, 239916, 0, 0, 165880];
+
+// Last active date per member (index matches MEMBERS)
+var LAST = ['2026-06-03','2026-06-04','2026-06-04','2026-06-03','2026-06-03','2026-06-03','2026-06-04','2026-04-18','2026-05-30','2026-05-23'];
+
+var MONTHLY = {
+  '2026-04': {convs:608,  msgs:5398, users:9},
+  '2026-05': {convs:532,  msgs:3322, users:9},
+  '2026-06': {convs:49,   msgs:248,  users:7}
+};
+
+var DAILY = {
+  '2026-04': {
+    labels:['Apr 02','Apr 03','Apr 05','Apr 06','Apr 07','Apr 08','Apr 09','Apr 10','Apr 11','Apr 12','Apr 13','Apr 14','Apr 15','Apr 16','Apr 17','Apr 18','Apr 19','Apr 20','Apr 21','Apr 22','Apr 23','Apr 24','Apr 25','Apr 26','Apr 27','Apr 28','Apr 29','Apr 30'],
+    data:  [5,9,6,20,32,34,24,16,7,3,30,21,16,26,14,9,6,30,12,33,41,42,17,16,36,40,30,33]
+  },
+  '2026-05': {
+    labels:['May 05','May 06','May 07','May 08','May 09','May 10','May 11','May 12','May 13','May 14','May 15','May 16','May 17','May 18','May 19','May 20','May 21','May 22','May 23','May 24','May 25','May 26','May 27','May 28','May 29','May 30','May 31'],
+    data:  [18,23,17,19,11,5,25,14,18,20,43,3,4,11,32,28,23,22,4,3,36,25,15,26,14,4,3]
+  },
+  '2026-06': {
+    labels:['Jun 01','Jun 02','Jun 03','Jun 04'],
+    data:  [20,13,10,6]
+  },
+  'all': {
+    labels:['Apr 02','Apr 06','Apr 08','Apr 10','Apr 13','Apr 16','Apr 18','Apr 20','Apr 22','Apr 24','Apr 27','Apr 30','May 05','May 07','May 09','May 11','May 13','May 15','May 18','May 20','May 22','May 25','May 27','May 29','May 31','Jun 01','Jun 02','Jun 03','Jun 04'],
+    data:  [5,20,34,16,30,26,9,30,33,42,36,33,18,17,11,25,18,43,11,28,22,36,15,14,3,20,13,10,6]
+  }
+};
+
+var META = {
+  'all':     {label:'All Time',   sub:'Apr 2 – Jun 4, 2026 · All Months', tag:'63-day snapshot'},
+  '2026-04': {label:'April 2026', sub:'April 1 – 30, 2026',               tag:'Monthly view'},
+  '2026-05': {label:'May 2026',   sub:'May 1 – 31, 2026',                 tag:'Monthly view'},
+  '2026-06': {label:'June 2026',  sub:'June 1 – 4, 2026',                 tag:'Partial month'}
+};
+
+var REPORT_DATE = new Date('2026-06-05');
+
+function daysSince(s) {
+  return Math.floor((REPORT_DATE - new Date(s)) / 86400000);
+}
+function fmtDate(s) {
+  return new Date(s).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'});
+}
+function fmtNum(n) {
+  return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+// ── CHART INSTANCES ──────────────────────────────────────────────────────────
+var A = '#6b8afd', A2 = '#f97316', G = '#22c55e', P = '#a855f7';
+var GR = '#2e3248', TX = '#8892aa';
+Chart.defaults.color = TX;
+Chart.defaults.borderColor = GR;
+Chart.defaults.font.family = "'Segoe UI',system-ui,sans-serif";
+
+var dailyInst = null, userInst = null, utilInst = null;
+
+// Static charts (never re-built)
+new Chart(document.getElementById('monthlyChart'), {
+  type:'bar',
+  data:{
+    labels:['April 2026','May 2026','June 2026\n(1-4)'],
+    datasets:[
+      {label:'Conversations', data:[608,532,49],   backgroundColor:A+'cc',  borderRadius:6, borderSkipped:false},
+      {label:'Messages',      data:[5398,3322,248], backgroundColor:G+'cc', borderRadius:6, borderSkipped:false, yAxisID:'y2'}
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:true,
+    plugins:{legend:{position:'top',labels:{boxWidth:12,font:{size:12}}}},
+    scales:{x:{grid:{color:GR}},y:{grid:{color:GR},beginAtZero:true,title:{display:true,text:'Conversations'}},y2:{position:'right',beginAtZero:true,grid:{display:false},title:{display:true,text:'Messages'}}}
+  }
+});
+
+new Chart(document.getElementById('codeChart'), {
+  type:'bar',
+  data:{
+    labels:['Ravi J.','Abhijit N.','Sachin N.','Banita G.','Arpita J.','Shweta S.','Akshat V.'],
+    datasets:[{label:'Lines of Code',data:[239916,165880,105082,57984,45798,9320,4769],
+      backgroundColor:[G,A,A,A2,A2,P,P].map(function(c){return c+'cc';}),borderRadius:6,borderSkipped:false}]
+  },
+  options:{responsive:true,maintainAspectRatio:true,indexAxis:'y',
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return ' '+fmtNum(ctx.parsed.x)+' lines';}}}},
+    scales:{x:{grid:{color:GR},beginAtZero:true,ticks:{callback:function(v){return (v/1000).toFixed(0)+'k';}}},y:{grid:{display:false}}}
+  }
+});
+
+// ── DYNAMIC BUILDERS ─────────────────────────────────────────────────────────
+function buildDaily(m) {
+  var d = DAILY[m];
+  if (dailyInst) { dailyInst.destroy(); }
+  dailyInst = new Chart(document.getElementById('dailyChart'), {
+    type:'line',
+    data:{labels:d.labels,datasets:[{label:'Conversations',data:d.data,
+      borderColor:A,backgroundColor:A+'22',fill:true,tension:.4,pointRadius:3,pointBackgroundColor:A,borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{display:false}},
+      scales:{x:{grid:{color:GR},ticks:{maxTicksLimit:12,font:{size:11}}},y:{grid:{color:GR},beginAtZero:true}}
+    }
+  });
+}
+
+function buildUserConv(m) {
+  var convs = CONVS[m];
+  var items = MEMBERS.map(function(mbr, i) { return {name:mbr.name, convs:convs[i]}; });
+  items.sort(function(a,b){return b.convs - a.convs;});
+  var labels = items.map(function(x){
+    var parts = x.name.split(' ');
+    return parts[0] + (parts[1] ? ' ' + parts[1][0] + '.' : '');
+  });
+  var data = items.map(function(x){return x.convs;});
+  var colors = [A,A,A,A2,A2,A2,G,P,P,P].map(function(c){return c+'cc';});
+  if (userInst) { userInst.destroy(); }
+  userInst = new Chart(document.getElementById('userConvChart'), {
+    type:'bar',
+    data:{labels:labels,datasets:[{label:'Conversations',data:data,backgroundColor:colors,borderRadius:6,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:true,indexAxis:'y',
+      plugins:{legend:{display:false}},
+      scales:{x:{grid:{color:GR},beginAtZero:true},y:{grid:{display:false},ticks:{font:{size:11}}}}
+    }
+  });
+}
+
+function buildUtil(m) {
+  var convs = CONVS[m];
+  var active = 0, inactive = 0;
+  for (var i = 0; i < convs.length; i++) {
+    if (convs[i] > 0) { active++; } else { inactive++; }
+  }
+  if (utilInst) { utilInst.destroy(); }
+  utilInst = new Chart(document.getElementById('utilChart'), {
+    type:'doughnut',
+    data:{
+      labels:['Active','Inactive'],
+      datasets:[{data:[active, inactive],backgroundColor:[G+'cc','#ef4444cc'],borderColor:'#1a1d27',borderWidth:3,hoverOffset:4}]
+    },
+    options:{responsive:true,maintainAspectRatio:true,cutout:'65%',
+      plugins:{
+        legend:{position:'bottom',labels:{boxWidth:12,font:{size:12},padding:16}},
+        tooltip:{callbacks:{label:function(ctx){return ' '+ctx.parsed+' of 10 ('+Math.round(ctx.parsed/10*100)+'%)';}}}
+      }
+    }
+  });
+}
+
+function buildTable(m) {
+  var convs = CONVS[m];
+  var msgs  = MSGS[m];
+  var maxC  = Math.max.apply(null, convs);
+
+  var rows = MEMBERS.map(function(mbr, i) {
+    return {mbr:mbr, convs:convs[i], msgs:msgs[i], code:CODE[i]};
+  });
+  rows.sort(function(a,b){return b.convs - a.convs;});
+
+  var rkClass = ['g','s','b','','','','','','',''];
+  var html = '';
+  for (var idx = 0; idx < rows.length; idx++) {
+    var r   = rows[idx];
+    var avg = r.convs > 0 ? (r.msgs / r.convs).toFixed(1) : '—';
+    var pct = maxC > 0 ? Math.round(r.convs / maxC * 100) : 0;
+    var roleLabel = (r.mbr.role === 'Primary Owner' || r.mbr.role === 'Owner') ? r.mbr.role : r.mbr.tier;
+    var roleCls   = (r.mbr.role === 'Primary Owner' || r.mbr.role === 'Owner') ? 'bo' : (r.mbr.tier === 'Standard' ? 'bs' : 'bp');
+    var statusBadge = r.convs > 0 ? '<span class="badge ba">Active</span>' : '<span class="badge bi">Inactive</span>';
+    var codeVal = ((m === '2026-05' || m === 'all') && r.code > 0) ? fmtNum(r.code) : '<span class="nd">—</span>';
+
+    html += '<tr>';
+    html += '<td><span class="rk ' + rkClass[idx] + '">' + (idx+1) + '</span></td>';
+    html += '<td><div class="uc"><div class="av">' + r.mbr.ini + '</div><div><div>' + r.mbr.name + '</div><div class="ue">' + r.mbr.email + '</div></div></div></td>';
+    html += '<td><span class="badge ' + roleCls + '">' + roleLabel + '</span></td>';
+    html += '<td><div class="pb-wrap"><div class="pb"><div class="fill" style="width:' + pct + '%"></div></div><span class="num">' + r.convs + '</span></div></td>';
+    html += '<td>' + fmtNum(r.msgs) + '</td>';
+    html += '<td>' + avg + '</td>';
+    html += '<td>' + codeVal + '</td>';
+    html += '<td>' + statusBadge + '</td>';
+    html += '</tr>';
+  }
+
+  document.getElementById('tBody').innerHTML = html;
+  document.getElementById('tCaption').textContent = 'Sorted by conversations · ' + META[m].label;
+}
+
+function buildInactive(m) {
+  // For "All Time", show who is inactive in June (current month) — business-relevant
+  var inactiveConvs = m === 'all' ? CONVS['2026-06'] : CONVS[m];
+  var periodLabel   = m === 'all' ? 'June 2026 (current)' : META[m].label;
+
+  var inactive = [];
+  for (var i = 0; i < MEMBERS.length; i++) {
+    if (inactiveConvs[i] === 0) {
+      inactive.push({mbr:MEMBERS[i], last:LAST[i]});
+    }
+  }
+  // Sort by days inactive descending
+  inactive.sort(function(a,b){ return daysSince(b.last) - daysSince(a.last); });
+
+  var count = inactive.length;
+  var badge = document.getElementById('iBadge');
+  badge.textContent = count;
+  badge.className = 'ibadge' + (count === 0 ? ' zero' : '');
+
+  document.getElementById('iPanelSub').textContent = 'No activity in ' + periodLabel;
+  document.getElementById('kInactive').textContent = count;
+  document.getElementById('kInactive').style.color = count === 0 ? 'var(--green)' : 'var(--red)';
+  document.getElementById('kInactiveSub').textContent = count === 0 ? '✓ All members active' : count + ' with no activity in ' + periodLabel;
+  document.getElementById('kInactiveSub').className = 'sub ' + (count === 0 ? 'up' : 'dn');
+
+  if (count === 0) {
+    document.getElementById('iList').innerHTML = '<div class="all-ok">✓ All members were active in ' + periodLabel + '</div>';
+    return;
+  }
+
+  var html = '';
+  for (var j = 0; j < inactive.length; j++) {
+    var days = daysSince(inactive[j].last);
+    var dnCls = days >= 30 ? 'crit' : days >= 14 ? 'warn' : 'ok';
+    var avatarBg = days >= 30 ? 'var(--red)' : days >= 14 ? 'var(--accent2)' : 'var(--muted)';
+    html += '<div class="iitem">';
+    html += '<div class="av" style="background:' + avatarBg + '">' + inactive[j].mbr.ini + '</div>';
+    html += '<div><div style="font-weight:600">' + inactive[j].mbr.name + '</div>';
+    html += '<div class="ue">' + inactive[j].mbr.email + '</div>';
+    html += '<div class="last-seen">Last active: ' + fmtDate(inactive[j].last) + '</div></div>';
+    html += '<div class="idays"><div class="dnum ' + dnCls + '">' + days + '</div><div class="dlbl">days ago</div></div>';
+    html += '</div>';
+  }
+  document.getElementById('iList').innerHTML = html;
+}
+
+function updateKPIs(m) {
+  var totalC, totalM, activeU;
+  if (m === 'all') {
+    totalC = 1189; totalM = 8968; activeU = 10;
+  } else {
+    totalC = MONTHLY[m].convs; totalM = MONTHLY[m].msgs; activeU = MONTHLY[m].users;
+  }
+  var avg = totalC > 0 ? (totalM / totalC).toFixed(1) : '0';
+
+  document.getElementById('kConvs').textContent    = fmtNum(totalC);
+  document.getElementById('kConvsSub').textContent = META[m].sub;
+  document.getElementById('kMsgs').textContent     = fmtNum(totalM);
+  document.getElementById('kMsgsSub').textContent  = 'Human prompts · ' + META[m].label;
+  document.getElementById('kResp').textContent     = fmtNum(totalC + Math.round(totalC * 0.006));
+  document.getElementById('kUsers').textContent    = activeU;
+  document.getElementById('kUsersSub').textContent = activeU + ' of 10 members active';
+
+  document.getElementById('hSub').textContent = META[m].sub;
+  document.getElementById('hTag').textContent = META[m].tag;
+  document.getElementById('fNote').textContent = META[m].label + ' · ' + META[m].sub;
+}
+
+function updateCodeNote(m) {
+  var note = document.getElementById('codeNote');
+  if (m === '2026-04' || m === '2026-06') {
+    note.style.display = 'block';
+    note.textContent = 'ℹ  Claude Code data is only available for May 2026. Charts below reflect May regardless of filter.';
+  } else {
+    note.style.display = 'none';
+  }
+}
+
+// ── MAIN ────────────────────────────────────────────────────────────────────
+function go(m) {
+  // Update button styles
+  ['all','2026-04','2026-05','2026-06'].forEach(function(k) {
+    var btn = document.getElementById('btn-' + k);
+    if (btn) btn.className = 'filter-btn' + (k === m ? ' active' : '');
+  });
+
+  updateKPIs(m);
+  updateCodeNote(m);
+  buildDaily(m);
+  buildUserConv(m);
+  buildUtil(m);
+  buildTable(m);
+  buildInactive(m);
+
+  document.getElementById('dTitle').textContent = 'Daily Conversations — ' + META[m].label;
+  document.getElementById('uTitle').textContent = 'Conversations per User — ' + META[m].label;
+  document.getElementById('uSub').textContent   = 'Conversations per team member · ' + META[m].label;
+}
+
+// Init
+go('all');
+</script>
+</body>
+</html>
