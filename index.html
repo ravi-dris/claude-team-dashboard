@@ -72,6 +72,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 .tbl-hdr h3{font-size:14px;font-weight:600;}
 table{width:100%;border-collapse:collapse;}
 th{text-align:left;font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);padding:9px 22px;background:#1e2130;border-bottom:1px solid var(--border);}
+th.sortable{cursor:pointer;user-select:none;white-space:nowrap;}
+th.sortable:hover{color:var(--text);}
+th.sort-active{color:var(--blue);}
+th.sort-active.sort-desc::after{content:' ↓';}
+th.sort-active.sort-asc::after{content:' ↑';}
+th.sortable:not(.sort-active)::after{content:' ↕';opacity:.3;}
 td{padding:11px 22px;font-size:13px;border-bottom:1px solid #1e2130;}
 tr:last-child td{border-bottom:none;}
 tr:hover td{background:#1e2130;}
@@ -504,8 +510,15 @@ tr:hover td{background:#1e2130;}
     <div class="tbl-hdr"><h3>All Members</h3><span id="tCaption">Sorted by conversations · All Time · Both Teams</span></div>
     <table>
       <thead><tr>
-        <th>#</th><th>Member</th><th id="thTeam">Team</th><th>Role &amp; Tier</th>
-        <th>Conversations</th><th>Messages Sent</th><th>Avg Msgs/Conv</th><th>Code Lines</th><th>Status</th>
+        <th>#</th>
+        <th class="sortable" id="th-name" onclick="sortTable('name')">Member</th>
+        <th id="thTeam">Team</th>
+        <th>Role &amp; Tier</th>
+        <th class="sortable sort-active sort-desc" id="th-convs"    onclick="sortTable('convs')">Conversations</th>
+        <th class="sortable" id="th-msgs"    onclick="sortTable('msgs')">Messages Sent</th>
+        <th class="sortable" id="th-avg"     onclick="sortTable('avg')">Avg Msgs/Conv</th>
+        <th class="sortable" id="th-code"    onclick="sortTable('code')">Code Lines</th>
+        <th class="sortable" id="th-status"  onclick="sortTable('status')">Status</th>
       </tr></thead>
       <tbody id="tBody"></tbody>
     </table>
@@ -609,6 +622,7 @@ function fmtDate(s){return new Date(s).toLocaleDateString('en-GB',{day:'numeric'
 function fmtNum(n){return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,',');}
 
 var curTeam='both', curMonth='all';
+var sortCol='convs', sortDir='desc';
 var dailyInst=null,monthlyInst=null,userInst=null,codeInst=null,utilInst=null;
 
 function getTeamData(t){return t==='product'?P:S;}
@@ -737,13 +751,25 @@ function buildTable(){
   var maxC=Math.max.apply(null,convs)||1;
   var showTeam=curTeam==='both';
   document.getElementById('thTeam').style.display=showTeam?'':'none';
-  var rows=members.map(function(m,i){return{m:m,convs:convs[i],msgs:msgs[i],code:code[i]};});
-  rows.sort(function(a,b){return b.convs-a.convs;});
+  var rows=members.map(function(m,i){
+    var avg=convs[i]>0?(msgs[i]/convs[i]):0;
+    return{m:m,convs:convs[i],msgs:msgs[i],code:code[i],avg:avg};
+  });
+  rows.sort(function(a,b){
+    var v=0;
+    if(sortCol==='name')   v=a.m.name.localeCompare(b.m.name);
+    else if(sortCol==='convs')  v=a.convs-b.convs;
+    else if(sortCol==='msgs')   v=a.msgs-b.msgs;
+    else if(sortCol==='avg')    v=a.avg-b.avg;
+    else if(sortCol==='code')   v=a.code-b.code;
+    else if(sortCol==='status') v=(a.convs>0?1:0)-(b.convs>0?1:0);
+    return sortDir==='desc'?-v:v;
+  });
   var rkC=['g','s','b','','','','','','','','','','','','','','','','','',''];
   var html='';
   for(var idx=0;idx<rows.length;idx++){
     var r=rows[idx];
-    var avg=r.convs>0?(r.msgs/r.convs).toFixed(1):'—';
+    var avg=r.convs>0?r.avg.toFixed(1):'—';
     var pct=Math.round(r.convs/maxC*100);
     var roleLabel=(r.m.role==='Primary Owner'||r.m.role==='Owner')?r.m.role:r.m.tier;
     var roleCls=(r.m.role==='Primary Owner'||r.m.role==='Owner')?'bo':(r.m.tier==='Standard'?'bs':'bp');
@@ -800,9 +826,30 @@ function buildInactive(){
   document.getElementById('iList').innerHTML=html;
 }
 
+function updateSortHeaders(){
+  var cols=['convs','msgs','avg','code','status','name'];
+  cols.forEach(function(c){
+    var el=document.getElementById('th-'+c);
+    if(!el) return;
+    el.className='sortable'+(c===sortCol?' sort-active sort-'+sortDir:'');
+  });
+  var colLabels={convs:'conversations',msgs:'messages sent',avg:'avg depth',code:'code lines',status:'status',name:'name'};
+  var tLabel=curTeam==='both'?'Both Teams':curTeam==='product'?'Product Team':'Services Team';
+  document.getElementById('tCaption').textContent=
+    'Sorted by '+colLabels[sortCol]+' ('+(sortDir==='desc'?'↓ high to low':'↑ low to high')+') · '+META[curMonth].label+' · '+tLabel;
+}
+
+function sortTable(col){
+  if(sortCol===col){ sortDir=sortDir==='desc'?'asc':'desc'; }
+  else{ sortCol=col; sortDir='desc'; }
+  updateSortHeaders();
+  buildTable();
+}
+
 function refresh(){
   updateKPIs(); updateCodeHL(); buildDaily(); buildMonthly();
   buildUserConv(); buildCodeChart(); buildUtil(); buildTable(); buildInactive();
+  updateSortHeaders();
 }
 
 function setTeam(t){
