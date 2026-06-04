@@ -736,9 +736,17 @@ function buildCodeChart(){
   document.getElementById('codeChartTitle').textContent='Claude Code Lines — '+META[curMonth].label+' · '+tLabel;
 }
 
+// Unified active check: has convs OR has code lines OR was recently active (≤14 days)
+function isActiveMember(c, cd, lastDate){
+  return c > 0 || cd > 0 || daysSince(lastDate) <= 14;
+}
+
 function buildUtil(){
-  var convs=getConvs(),tot=getTotalMbr(),active=0,inactive=0;
-  for(var i=0;i<convs.length;i++){if(convs[i]>0){active++;}else{inactive++;}}
+  var members=getMembers(),convs=getConvs(),codeArr=getCode(),last=getLast(),tot=getTotalMbr();
+  var active=0,inactive=0;
+  for(var i=0;i<members.length;i++){
+    if(isActiveMember(convs[i],codeArr[i],last[i])){active++;}else{inactive++;}
+  }
   if(utilInst){utilInst.destroy();}
   utilInst=new Chart(document.getElementById('utilChart'),{
     type:'doughnut',data:{labels:['Active','Inactive'],datasets:[{data:[active,inactive],backgroundColor:[GR+'cc',RE+'cc'],borderColor:'#1a1d27',borderWidth:3,hoverOffset:4}]},
@@ -751,18 +759,20 @@ function buildTable(){
   var maxC=Math.max.apply(null,convs)||1;
   var showTeam=curTeam==='both';
   document.getElementById('thTeam').style.display=showTeam?'':'none';
+  var last=getLast();
   var rows=members.map(function(m,i){
     var avg=convs[i]>0?(msgs[i]/convs[i]):0;
-    return{m:m,convs:convs[i],msgs:msgs[i],code:code[i],avg:avg};
+    var active=isActiveMember(convs[i],code[i],last[i]);
+    return{m:m,convs:convs[i],msgs:msgs[i],code:code[i],avg:avg,active:active};
   });
   rows.sort(function(a,b){
     var v=0;
-    if(sortCol==='name')   v=a.m.name.localeCompare(b.m.name);
+    if(sortCol==='name')        v=a.m.name.localeCompare(b.m.name);
     else if(sortCol==='convs')  v=a.convs-b.convs;
     else if(sortCol==='msgs')   v=a.msgs-b.msgs;
     else if(sortCol==='avg')    v=a.avg-b.avg;
     else if(sortCol==='code')   v=a.code-b.code;
-    else if(sortCol==='status') v=(a.convs>0?1:0)-(b.convs>0?1:0);
+    else if(sortCol==='status') v=(a.active?1:0)-(b.active?1:0);
     return sortDir==='desc'?-v:v;
   });
   var rkC=['g','s','b','','','','','','','','','','','','','','','','','',''];
@@ -783,7 +793,7 @@ function buildTable(){
     html+='<td><div class="pb-wrap"><div class="pb"><div class="fill" style="width:'+pct+'%;background:'+barColor+'"></div></div><span class="num">'+r.convs+'</span></div></td>';
     html+='<td>'+fmtNum(r.msgs)+'</td><td>'+avg+'</td>';
     html+='<td>'+(r.code>0?fmtNum(r.code):'0')+'</td>';
-    html+='<td>'+(r.convs>0?'<span class="badge ba">Active</span>':'<span class="badge bi">Inactive</span>')+'</td>';
+    html+='<td>'+(r.active?'<span class="badge ba">Active</span>':'<span class="badge bi">Inactive</span>')+'</td>';
     html+='</tr>';
   }
   document.getElementById('tBody').innerHTML=html;
@@ -795,9 +805,10 @@ function buildInactive(){
   var members=getMembers(),last=getLast();
   var convKey=curMonth==='all'?'2026-06':curMonth;
   var checkConvs=curTeam==='both'?P.convs[convKey].concat(S.convs[convKey]):(curTeam==='product'?P.convs[convKey]:S.convs[convKey]);
+  var checkCode =curTeam==='both'?P.code[convKey].concat(S.code[convKey]):(curTeam==='product'?P.code[convKey]:S.code[convKey]);
   var inactive=[],tot=getTotalMbr();
   for(var i=0;i<members.length;i++){
-    if(checkConvs[i]===0&&daysSince(last[i])>14) inactive.push({m:members[i],last:last[i]});
+    if(!isActiveMember(checkConvs[i],checkCode[i],last[i])) inactive.push({m:members[i],last:last[i]});
   }
   inactive.sort(function(a,b){return daysSince(b.last)-daysSince(a.last);});
   var count=inactive.length;
