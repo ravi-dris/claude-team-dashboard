@@ -229,8 +229,8 @@ var MSGS = {
 // Claude Code lines — May only (index matches MEMBERS)
 var CODE = [0, 105082, 9320, 57984, 4769, 45798, 239916, 0, 0, 165880];
 
-// Last active date per member (index matches MEMBERS)
-var LAST = ['2026-06-03','2026-06-04','2026-06-04','2026-06-03','2026-06-03','2026-06-03','2026-06-04','2026-04-18','2026-05-30','2026-05-23'];
+// Last active date per member — includes Claude Code activity, not just chat
+var LAST = ['2026-06-03','2026-06-04','2026-06-04','2026-06-03','2026-06-03','2026-06-03','2026-06-04','2026-04-18','2026-05-30','2026-05-31'];
 
 var MONTHLY = {
   '2026-04': {convs:608,  msgs:5398, users:9},
@@ -410,14 +410,27 @@ function buildTable(m) {
 }
 
 function buildInactive(m) {
-  // For "All Time", show who is inactive in June (current month) — business-relevant
-  var inactiveConvs = m === 'all' ? CONVS['2026-06'] : CONVS[m];
-  var periodLabel   = m === 'all' ? 'June 2026 (current)' : META[m].label;
-
   var inactive = [];
-  for (var i = 0; i < MEMBERS.length; i++) {
-    if (inactiveConvs[i] === 0) {
-      inactive.push({mbr:MEMBERS[i], last:LAST[i]});
+  var periodLabel;
+
+  if (m === 'all') {
+    // All Time: inactive = last active more than 14 days ago (covers both chat + Claude Code)
+    periodLabel = 'last 14 days';
+    for (var i = 0; i < MEMBERS.length; i++) {
+      if (daysSince(LAST[i]) > 14) {
+        inactive.push({mbr:MEMBERS[i], last:LAST[i]});
+      }
+    }
+  } else {
+    // Monthly: inactive = 0 convs AND 0 code lines (for May where code data exists)
+    periodLabel = META[m].label;
+    var convs = CONVS[m];
+    for (var i = 0; i < MEMBERS.length; i++) {
+      var noConvs = convs[i] === 0;
+      var noCode  = (m === '2026-05') ? CODE[i] === 0 : true;
+      if (noConvs && noCode) {
+        inactive.push({mbr:MEMBERS[i], last:LAST[i]});
+      }
     }
   }
   // Sort by days inactive descending
