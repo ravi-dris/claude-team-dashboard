@@ -391,7 +391,7 @@ function buildTable(m) {
     var roleLabel = (r.mbr.role === 'Primary Owner' || r.mbr.role === 'Owner') ? r.mbr.role : r.mbr.tier;
     var roleCls   = (r.mbr.role === 'Primary Owner' || r.mbr.role === 'Owner') ? 'bo' : (r.mbr.tier === 'Standard' ? 'bs' : 'bp');
     var statusBadge = r.convs > 0 ? '<span class="badge ba">Active</span>' : '<span class="badge bi">Inactive</span>';
-    var codeVal = ((m === '2026-05' || m === 'all') && r.code > 0) ? fmtNum(r.code) : '<span class="nd">—</span>';
+    var codeVal = (m === '2026-05' || m === 'all') ? (r.code > 0 ? fmtNum(r.code) : '0') : '<span class="nd">—</span>';
 
     html += '<tr>';
     html += '<td><span class="rk ' + rkClass[idx] + '">' + (idx+1) + '</span></td>';
