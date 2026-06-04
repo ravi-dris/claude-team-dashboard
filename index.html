@@ -158,14 +158,13 @@ tr:hover td{background:#1e2130;}
     </div>
   </div>
 
-  <div class="sec" id="codeSec">Claude Code Highlights — May 2026</div>
-  <div class="explain"><b>Claude Code</b> is the AI coding assistant used inside VS Code and terminal. <b>Lines of Code Accepted</b> = total AI-written code lines that developers kept (not rejected). <b>Suggestion Accept Rate</b> = what % of AI suggestions were accepted — 99.8% means the team trusts Claude's code almost completely. This data is only available for May 2026 as that's the export period — it stays fixed regardless of the month filter.</div>
-  <div id="codeNote" class="code-note" style="display:none;"></div>
+  <div class="sec" id="codeSec">Claude Code Highlights</div>
+  <div class="explain"><b>Claude Code</b> is the AI coding assistant used inside VS Code and terminal. <b>Lines of Code Accepted</b> = total AI-written code lines that developers kept (not rejected). <b>Suggestion Accept Rate</b> = % of AI suggestions accepted — 99.8% in May means near-total trust in AI output (only available for May). These highlights now update with the month filter.</div>
   <div class="hl-grid">
-    <div class="hl gr"><div class="hl-lbl">Lines of Code Accepted</div><div class="hl-val">628,749</div><div class="hl-sub">AI-generated, developer-accepted</div></div>
-    <div class="hl"><div class="hl-lbl">Suggestion Accept Rate</div><div class="hl-val">99.8%</div><div class="hl-sub">Exceptionally high trust in AI output</div></div>
-    <div class="hl or"><div class="hl-lbl">Top Code Contributor</div><div class="hl-val">239,916</div><div class="hl-sub">Lines — ravi.jangir (May)</div></div>
-    <div class="hl pu"><div class="hl-lbl">Active Code Users</div><div class="hl-val">7 / 10</div><div class="hl-sub">Members using Claude Code in May</div></div>
+    <div class="hl gr"><div class="hl-lbl">Lines of Code Accepted</div><div class="hl-val" id="hlLines">628,749</div><div class="hl-sub" id="hlLinesSub">AI-generated, developer-accepted</div></div>
+    <div class="hl"><div class="hl-lbl">Suggestion Accept Rate</div><div class="hl-val" id="hlRate">99.8%</div><div class="hl-sub" id="hlRateSub">May 2026 only</div></div>
+    <div class="hl or"><div class="hl-lbl">Top Code Contributor</div><div class="hl-val" id="hlTop">239,916</div><div class="hl-sub" id="hlTopSub">Lines — ravi.jangir</div></div>
+    <div class="hl pu"><div class="hl-lbl">Active Code Users</div><div class="hl-val" id="hlUsers">7 / 10</div><div class="hl-sub" id="hlUsersSub">Members with code lines</div></div>
   </div>
 
   <div class="sec">Activity Trends</div>
@@ -179,7 +178,7 @@ tr:hover td{background:#1e2130;}
   <div class="explain"><b>Conversations per User</b> ranks who uses Claude most for the selected month — this updates when you change the filter. High conversation count = high reliance on AI for day-to-day work. <b>Claude Code Lines per User</b> shows developer productivity specifically — a developer with few conversations but many code lines is a code-first user (uses Claude Code in terminal/IDE rather than the web chat). Both charts together give a complete picture of how each person uses AI.</div>
   <div class="two-col">
     <div class="chart-card"><h3 id="uTitle">Conversations per User — All Time</h3><p id="uSub">Conversations per team member for selected period</p><canvas id="userConvChart"></canvas></div>
-    <div class="chart-card"><h3>Claude Code Lines — May 2026</h3><p>Lines of AI-generated code accepted per developer (May only)</p><canvas id="codeChart"></canvas></div>
+    <div class="chart-card"><h3 id="codeChartTitle">Claude Code Lines — All Time</h3><p>Lines of AI-generated code accepted per developer for selected period</p><canvas id="codeChart"></canvas></div>
   </div>
 
   <div class="sec">Member Activity Breakdown</div>
@@ -234,11 +233,18 @@ var MSGS = {
   '2026-05': [ 343,  833,  761,  505, 449, 157, 257,  0,  3,  14],
   '2026-06': [   5,   48,   57,   12,  60,  57,   9,  0,  0,   0]
 };
-// Claude Code lines — May only (index matches MEMBERS)
-var CODE = [0, 105082, 9320, 57984, 4769, 45798, 239916, 0, 0, 165880];
+// Claude Code lines per user per month (index matches MEMBERS)
+// Note: om.prakash and fathima.nihala appear in April export but are not in the team members list
+var CODE = {
+  '2026-04': [0,  28417,   288, 45505, 4121, 35858,  83636, 0, 48380,      0],
+  '2026-05': [0, 105082,  9320, 57984, 4769, 45798, 239916, 0,     0, 165880],
+  '2026-06': [0,    961,     0,  1126,    0, 19013,      0, 0,     0,      0],
+  'all':     [0, 134460,  9608,104615, 8890,100669, 323552, 0, 48380, 165880]
+};
 
 // Last active date per member — includes Claude Code activity, not just chat
-var LAST = ['2026-06-03','2026-06-04','2026-06-04','2026-06-03','2026-06-03','2026-06-03','2026-06-04','2026-04-18','2026-05-30','2026-05-31'];
+var LAST = ['2026-06-03','2026-06-04','2026-06-04','2026-06-04','2026-06-03','2026-06-04','2026-06-04','2026-04-18','2026-05-30','2026-05-31'];
+//          aastha       sachin       shweta       banita(Jun code) akshat  arpita(Jun code) ravi  sunandan   nihaan      abhijit
 
 var MONTHLY = {
   '2026-04': {convs:608,  msgs:5398, users:9},
@@ -309,18 +315,31 @@ new Chart(document.getElementById('monthlyChart'), {
   }
 });
 
-new Chart(document.getElementById('codeChart'), {
-  type:'bar',
-  data:{
-    labels:['Ravi J.','Abhijit N.','Sachin N.','Banita G.','Arpita J.','Shweta S.','Akshat V.'],
-    datasets:[{label:'Lines of Code',data:[239916,165880,105082,57984,45798,9320,4769],
-      backgroundColor:[G,A,A,A2,A2,P,P].map(function(c){return c+'cc';}),borderRadius:6,borderSkipped:false}]
-  },
-  options:{responsive:true,maintainAspectRatio:true,indexAxis:'y',
-    plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return ' '+fmtNum(ctx.parsed.x)+' lines';}}}},
-    scales:{x:{grid:{color:GR},beginAtZero:true,ticks:{callback:function(v){return (v/1000).toFixed(0)+'k';}}},y:{grid:{display:false}}}
-  }
-});
+var codeChartInst = null;
+
+function buildCodeChart(m) {
+  var codeArr = CODE[m];
+  // Pair each member with their code lines, filter out zeros, sort descending
+  var items = MEMBERS.map(function(mbr,i){return {name:mbr.name,lines:codeArr[i]};})
+    .filter(function(x){return x.lines > 0;})
+    .sort(function(a,b){return b.lines - a.lines;});
+
+  var labels = items.map(function(x){
+    var p = x.name.split(' '); return p[0] + (p[1] ? ' '+p[1][0]+'.' : '');
+  });
+  var data = items.map(function(x){return x.lines;});
+  var colors = [G,A,A,A2,A2,P,P,P,P,P].slice(0,items.length).map(function(c){return c+'cc';});
+
+  if (codeChartInst){codeChartInst.destroy();}
+  codeChartInst = new Chart(document.getElementById('codeChart'),{
+    type:'bar',
+    data:{labels:labels,datasets:[{label:'Lines of Code',data:data,backgroundColor:colors,borderRadius:6,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:true,indexAxis:'y',
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return ' '+fmtNum(ctx.parsed.x)+' lines';}}}},
+      scales:{x:{grid:{color:GR},beginAtZero:true,ticks:{callback:function(v){return (v/1000).toFixed(0)+'k';}}},y:{grid:{display:false}}}
+    }
+  });
+}
 
 // ── DYNAMIC BUILDERS ─────────────────────────────────────────────────────────
 function buildDaily(m) {
@@ -385,8 +404,9 @@ function buildTable(m) {
   var msgs  = MSGS[m];
   var maxC  = Math.max.apply(null, convs);
 
+  var codeArr = CODE[m];
   var rows = MEMBERS.map(function(mbr, i) {
-    return {mbr:mbr, convs:convs[i], msgs:msgs[i], code:CODE[i]};
+    return {mbr:mbr, convs:convs[i], msgs:msgs[i], code:codeArr[i]};
   });
   rows.sort(function(a,b){return b.convs - a.convs;});
 
@@ -399,7 +419,7 @@ function buildTable(m) {
     var roleLabel = (r.mbr.role === 'Primary Owner' || r.mbr.role === 'Owner') ? r.mbr.role : r.mbr.tier;
     var roleCls   = (r.mbr.role === 'Primary Owner' || r.mbr.role === 'Owner') ? 'bo' : (r.mbr.tier === 'Standard' ? 'bs' : 'bp');
     var statusBadge = r.convs > 0 ? '<span class="badge ba">Active</span>' : '<span class="badge bi">Inactive</span>';
-    var codeVal = (m === '2026-05' || m === 'all') ? (r.code > 0 ? fmtNum(r.code) : '0') : '<span class="nd">—</span>';
+    var codeVal = r.code > 0 ? fmtNum(r.code) : '0';
 
     html += '<tr>';
     html += '<td><span class="rk ' + rkClass[idx] + '">' + (idx+1) + '</span></td>';
@@ -486,14 +506,26 @@ function updateKPIs(m) {
   document.getElementById('fNote').textContent = META[m].label + ' · ' + META[m].sub;
 }
 
-function updateCodeNote(m) {
-  var note = document.getElementById('codeNote');
-  if (m === '2026-04' || m === '2026-06') {
-    note.style.display = 'block';
-    note.textContent = 'ℹ  Claude Code data is only available for May 2026. Charts below reflect May regardless of filter.';
-  } else {
-    note.style.display = 'none';
-  }
+// Highlight data per month
+var CODE_HL = {
+  'all':     {lines:'896,054', rate:'99.8% (May)', topVal:'323,552', topWho:'ravi.jangir (all time)', activeUsers:'8 / 10'},
+  '2026-04': {lines:'246,205', rate:'N/A',          topVal: '83,636', topWho:'ravi.jangir',           activeUsers:'7 / 10'},
+  '2026-05': {lines:'628,749', rate:'99.8%',         topVal:'239,916', topWho:'ravi.jangir',           activeUsers:'7 / 10'},
+  '2026-06': {lines: '21,100', rate:'N/A',           topVal: '19,013', topWho:'arpita.jain',           activeUsers:'3 / 10'}
+};
+
+function buildCodeHighlights(m) {
+  var h = CODE_HL[m];
+  document.getElementById('hlLines').textContent    = h.lines;
+  document.getElementById('hlLinesSub').textContent = 'AI-generated code accepted · ' + META[m].label;
+  document.getElementById('hlRate').textContent     = h.rate;
+  document.getElementById('hlRateSub').textContent  = h.rate === 'N/A' ? 'Not available for this period' : 'Exceptionally high trust in AI output';
+  document.getElementById('hlTop').textContent      = h.topVal;
+  document.getElementById('hlTopSub').textContent   = 'Lines — ' + h.topWho;
+  document.getElementById('hlUsers').textContent    = h.activeUsers;
+  document.getElementById('hlUsersSub').textContent = 'Members with code lines · ' + META[m].label;
+  document.getElementById('codeSec').textContent    = 'Claude Code Highlights — ' + META[m].label;
+  document.getElementById('codeChartTitle').textContent = 'Claude Code Lines — ' + META[m].label;
 }
 
 // ── MAIN ────────────────────────────────────────────────────────────────────
@@ -505,7 +537,8 @@ function go(m) {
   });
 
   updateKPIs(m);
-  updateCodeNote(m);
+  buildCodeHighlights(m);
+  buildCodeChart(m);
   buildDaily(m);
   buildUserConv(m);
   buildUtil(m);
