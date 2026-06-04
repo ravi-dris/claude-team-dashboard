@@ -9,40 +9,78 @@
 
 ## What This Is
 
-A **self-contained HTML dashboard** that visualises your team's Claude AI usage — conversations, messages, Claude Code productivity, inactive members, and seat utilisation. Opens in any browser, no server or install needed. Has a month filter (All Time / monthly) that updates every section dynamically.
+A **self-contained HTML dashboard** for reporting Claude AI usage to leadership. Covers multiple teams with a dual filter (Team + Month). Opens in any browser — no server, no install.
+
+**Built for:** Dhwani RIS — Product Team (10 members) and Services Team (11 members)  
+**Data period:** April 2 – June 4, 2026  
+**Total members:** 21 across both teams
 
 ---
 
-## Step 1 — Export Your Data from Claude.ai
+## Dashboard Sections (in order)
 
-You need to be a **Team/Enterprise admin** on claude.ai.
+| # | Section | What It Shows |
+|---|---|---|
+| 1 | Overall Performance | 5 KPI cards: Conversations, Messages, AI Responses, Active Members, Inactive Members |
+| 2 | Key Insights | 6 org-level insight cards + 21 per-member spotlight cards |
+| 3 | Claude Code Highlights | Lines accepted, accept rate, top contributor, active code users — updates with filters |
+| 4 | Activity Trends | Daily conversations chart + Monthly comparison (Product vs Services) |
+| 5 | User Engagement | Conversations per user + Code lines per user — both filterable |
+| 6 | Member Activity Breakdown | Sortable table — click any column header to sort |
+| 7 | Inactive Members + Seat Utilisation | Who's inactive + doughnut chart |
 
-### A. Full account data export (ZIP)
-1. Go to [claude.ai](https://claude.ai) → **Settings → Account → Privacy**
-2. Click **Export Data** → Download the ZIP
-3. Contains: `conversations.json`, `users.json`, `projects/`, `memories.json`
+---
+
+## Filters
+
+**Row 1 — Team:** Both Teams · Product Team · Services Team  
+**Row 2 — Month:** All Time · April · May · June
+
+Every section updates when either filter changes. Charts colour-code by team: **blue = Product, orange = Services**.
+
+---
+
+## Active vs Inactive Definition
+
+A member is **Active** if ANY of:
+1. Had **conversations > 0** in the selected period
+2. Had **code lines > 0** in the selected period (Claude Code users)
+3. **Last activity ≤ 14 days ago** (covers recently active members in partial months)
+
+A member is **Inactive** only if ALL three conditions fail — 0 convs, 0 code, AND last active > 14 days ago.
+
+> This is why Ankit Jangir shows Active in June (0 chats but 60,324 code lines), and why Abhijit Nair shows Active (165K code lines, 3 chats). The same rule applies to the KPI card, the Inactive Members panel, and the Seat Utilisation doughnut — they are all consistent.
+
+---
+
+## Step 1 — Export Data from Claude.ai
+
+You need **Team/Enterprise admin** access on claude.ai.
+
+### A. Full data export (ZIP)
+Settings → Account → Privacy → **Export Data**  
+Contains: `conversations.json`, `users.json`, `projects/`
 
 ### B. Members CSV
-1. Go to **Settings → Organization → Members**
-2. Click **Export** → Download CSV
-3. Columns: Name, Email, Role, Status, Seat Tier
+Settings → Organization → Members → **Export**  
+Columns: Name, Email, Role, Status, Seat Tier
 
-### C. Claude Code CSV (if your team uses Claude Code)
-1. Go to **Settings → Organization → Claude Code**
-2. Select the month → Click **Export**
-3. Columns: User, Lines this Month
+### C. Claude Code CSVs (one per month)
+Settings → Organization → Claude Code → select month → **Export**  
+Columns: User, Lines this Month  
+Export one CSV per month you want to cover.
 
 ---
 
-## Step 2 — Extract the Numbers (Python script)
+## Step 2 — Extract the Numbers
 
-Run this on the ZIP to get per-user, per-month conversation and message counts:
+Run this Python script on each team's ZIP:
 
 ```python
 import zipfile, json
 from collections import defaultdict
 
-ZIP = 'your-export.zip'   # path to your downloaded ZIP
+ZIP = 'your-export.zip'
 
 with zipfile.ZipFile(ZIP) as z:
     convs = json.load(z.open('conversations.json'))
@@ -57,14 +95,14 @@ for c in convs:
     if not email: continue
     month = c['created_at'][:7]
     monthly[email][month]['convs'] += 1
-    monthly[email][month]['msgs']  += sum(1 for m in c.get('chat_messages',[]) if m['sender']=='human')
+    monthly[email][month]['msgs'] += sum(1 for m in c.get('chat_messages',[]) if m['sender']=='human')
 
 for email in sorted(monthly):
     for month in sorted(monthly[email]):
         d = monthly[email][month]
         print(f"{email} | {month} | convs={d['convs']} | msgs={d['msgs']}")
 
-# Last active date per user (chat only — update manually for Claude Code users)
+# Last active date per user (chat only)
 last_active = {}
 for c in convs:
     email = user_map.get(c['account']['uuid'])
@@ -73,166 +111,197 @@ for c in convs:
     if email not in last_active or d > last_active[email]:
         last_active[email] = d
 
-print("\nLast active (chat):")
+print("\nLast active:")
 for email, d in sorted(last_active.items(), key=lambda x: x[1], reverse=True):
     print(f"  {email}: {d}")
 ```
 
-> **Note on last active dates:** The script captures last chat activity. For developers who use Claude Code (terminal/IDE), manually set their last active date to the end of the month they last used Claude Code — they may have low chat counts but high code lines.
+> **Important for Claude Code users:** The script only captures last *chat* activity. For developers who primarily use Claude Code (terminal/IDE), manually set their `last` date to the last day of the month they had code output. Example: if Abhijit had 165K lines in May, set his last date to `2026-05-31`.
 
 ---
 
 ## Step 3 — Update the Dashboard HTML
 
-Open `index.html` in any text editor. Find the `// ── DATA` section in the `<script>` block and update:
+Open `index.html`. There are **two team data objects** at the top of the `<script>` block: `var P = {...}` (Product) and `var S = {...}` (Services). Update both.
 
-### 3a. MEMBERS array — one entry per team member
+Each team object has these fields:
+
+### members — one entry per person
 ```javascript
-var MEMBERS = [
-  {name:'Full Name', email:'user@org.com', ini:'AB', role:'User', tier:'Premium'},
-  // role: 'User' | 'Owner' | 'Primary Owner'
-  // tier: 'Premium' | 'Standard'
-  // ini: 2-letter initials for avatar
-];
+{name:'Full Name', email:'user@org.com', ini:'AB', role:'User', tier:'Premium', team:'product'}
+// role: 'User' | 'Owner' | 'Primary Owner'
+// tier: 'Premium' | 'Standard'
+// team: 'product' or 'services'
+// ini: 2-letter initials shown in avatar
 ```
-> **Order matters** — all other arrays (CONVS, MSGS, CODE, LAST) must have values in the same index order as MEMBERS.
+> **Index order matters** — all arrays (convs, msgs, code, last) must be in the same order as members.
 
-### 3b. CONVS — conversations per user per month
+### convs — conversations per user per month
 ```javascript
-var CONVS = {
-  'all':     [302, 257, ...],   // all-time totals
+convs: {
+  'all':     [302, 257, ...],   // all-time totals, one per member
   '2026-04': [229,  37, ...],   // April
   '2026-05': [ 69, 207, ...],   // May
-  '2026-06': [  4,  13, ...],   // June (partial if mid-month)
-};
+  '2026-06': [  4,  13, ...],   // June (partial)
+}
 ```
 
-### 3c. MSGS — human messages per user per month
+### msgs — human messages per user per month
 ```javascript
-var MSGS = {
+msgs: {
   'all':     [1771, 1107, ...],
   '2026-04': [1423,  226, ...],
   '2026-05': [ 343,  833, ...],
   '2026-06': [   5,   48, ...],
-};
+}
 ```
 
-### 3d. CODE — Claude Code lines accepted (one month only, 0 if not a code user)
+### code — Claude Code lines per user per month
 ```javascript
-var CODE = [0, 105082, 9320, 57984, 4769, 45798, 239916, 0, 0, 165880];
+code: {
+  'all':     [0, 134460, 9608, ...],   // sum across all months
+  '2026-04': [0,  28417,  288, ...],
+  '2026-05': [0, 105082, 9320, ...],
+  '2026-06': [0,    961,    0, ...],
+}
 ```
 
-### 3e. LAST — last active date per user (chat + Claude Code combined)
+### last — last active date per user (chat + Claude Code combined)
 ```javascript
-var LAST = ['2026-06-03', '2026-06-04', ...];
+last: ['2026-06-04', '2026-05-01', '2026-06-04', ...]
 ```
-> For Claude Code-heavy users with low chat activity, set this to the last day of the month they last used Claude Code.
 
-### 3f. MONTHLY — total convs, msgs, active users per month
+### monthly — totals per month
 ```javascript
-var MONTHLY = {
-  '2026-04': {convs:608,  msgs:5398, users:9},
-  '2026-05': {convs:532,  msgs:3322, users:9},
-  '2026-06': {convs:49,   msgs:248,  users:7},
-};
+monthly: {
+  '2026-04': {c:608, m:5398, u:9},   // c=convs, m=msgs, u=active users
+  '2026-05': {c:532, m:3322, u:9},
+  '2026-06': {c:49,  m:248,  u:7},
+}
 ```
 
-### 3g. DAILY — conversation counts per day
+### daily — conversations per day
 ```javascript
-var DAILY = {
-  '2026-04': { labels:['Apr 02', ...], data:[5, 9, ...] },
-  '2026-05': { labels:['May 05', ...], data:[18,23, ...] },
-  '2026-06': { labels:['Jun 01', ...], data:[20,13, ...] },
-  'all':     { labels:['Apr 02', ...], data:[5, 20, ...] },  // sampled key dates
-};
+daily: {
+  '2026-04': { L:['Apr 02','Apr 03',...], D:[5,9,...] },
+  '2026-05': { L:['May 05','May 06',...], D:[18,23,...] },
+  '2026-06': { L:['Jun 01','Jun 02',...], D:[20,13,...] },
+  'all':     { L:[sampled key dates],     D:[sampled counts] }
+}
 ```
 
-### 3h. META — month labels and subtitles
+### Also update these global objects:
+
+**META** — month labels:
 ```javascript
 var META = {
-  'all':     {label:'All Time',   sub:'Apr 2 – Jun 4, 2026 · All Months', tag:'63-day snapshot'},
-  '2026-04': {label:'April 2026', sub:'April 1 – 30, 2026',               tag:'Monthly view'},
-  '2026-05': {label:'May 2026',   sub:'May 1 – 31, 2026',                 tag:'Monthly view'},
-  '2026-06': {label:'June 2026',  sub:'June 1 – 4, 2026',                 tag:'Partial month'},
+  'all':     {label:'All Time',   sub:'Apr 2 – Jun 4, 2026'},
+  '2026-04': {label:'April 2026', sub:'April 2026'},
+  '2026-05': {label:'May 2026',   sub:'May 2026'},
+  '2026-06': {label:'June 2026',  sub:'June 1–4, 2026'},
 };
 ```
 
-### 3i. Update the HTML header
-Find these lines near the top of the `<body>` and update for your org:
+**CODE_HL** — Claude Code highlight cards per team per month:
+```javascript
+var CODE_HL = {
+  both:     { all:{lines,rate,top,topWho,users}, '2026-04':{...}, ... },
+  product:  { all:{...}, '2026-04':{...}, ... },
+  services: { all:{...}, '2026-04':{...}, ... },
+};
+```
+
+**REPORT_DATE** — used for "days since last active" calculation:
+```javascript
+var REPORT_DATE = new Date('2026-06-05');  // day after report date
+```
+
+### Update HTML header
 ```html
 <div>Your Organisation Name</div>
-<div>Your Name, Your Role</div>
-<div>Report Date</div>
-<div>X members | Plan name</div>
+<div>Prepared for: Your Name, Your Role</div>
+<div>Report Date: June 4, 2026</div>
 ```
 
-Also update the month keys throughout (`2026-04` → your months), and the filter buttons:
+### Add/update filter buttons for months:
 ```html
-<button onclick="go('2026-04')">April 2026</button>
+<button onclick="setMonth('2026-07')">July 2026</button>
 ```
 
 ---
 
-## Step 4 — Host It (Optional)
+## Step 4 — Per-Member Spotlight Cards
 
-The file works locally — just open `index.html` in Chrome/Edge. To give colleagues a shareable URL:
+The Key Insights section includes a **Member Spotlight** — one card per person with their actual usage pattern and what they use Claude for. These are based on real conversation topic names from `conversations.json`.
 
-1. Create a free GitHub account at github.com
-2. Install GitHub CLI: `winget install GitHub.cli` then `gh auth login`
-3. Create a repo and enable Pages:
+To update them: extract conversation names from the ZIP and rewrite the static HTML cards in the `<!-- Per-member spotlight -->` section. Each card follows this structure:
+
+```html
+<div style="...border-left:3px solid [colour]...">
+  <!-- Header: avatar + name + team badge -->
+  <!-- Stats row: convs, msgs, avg, code -->
+  <!-- Usage archetype badge -->
+  <!-- 2-3 sentence description of actual usage -->
+</div>
+```
+
+Colour by archetype:
+- `var(--blue)` = Deep Collaborator (high avg msgs/conv)
+- `var(--green)` = Volume User (high conversation count)
+- `var(--purple)` = Silent Coder (low convs, high code lines)
+- `var(--orange)` = Specialist (domain-specific use)
+- `var(--red)` = Needs Activation (low usage, inactive)
+- `var(--muted)` = Growing User (increasing trend)
+
+---
+
+## Step 5 — Host on GitHub Pages
+
 ```bash
-mkdir my-dashboard && cd my-dashboard
-git init
-cp path/to/index.html .
-git add . && git commit -m "Add dashboard"
+# One-time setup
 gh repo create my-claude-dashboard --public
+cd my-dashboard-folder
+git init
 git remote add origin https://github.com/YOUR-USERNAME/my-claude-dashboard.git
-git branch -M main && git push -u origin main
-git checkout -b gh-pages && git push origin gh-pages
+
+# Each update
+git add index.html
+git commit -m "Update dashboard — July 2026"
+git push origin gh-pages
+# Live at: https://YOUR-USERNAME.github.io/my-claude-dashboard/
 ```
-4. Go to your repo → Settings → Pages → set source to `gh-pages` branch
-5. Your URL: `https://YOUR-USERNAME.github.io/my-claude-dashboard/`
 
----
-
-## Dashboard Sections Explained
-
-| Section | What It Shows | How Calculated |
-|---|---|---|
-| **Overall Performance** | 5 KPI cards — conversations, messages, AI responses, active/inactive members | Summed from conversations.json for selected period |
-| **Inactive Members** | Who hasn't been active recently | 0 convs in period AND last active > 14 days ago |
-| **Seat Utilisation** | Active vs inactive seats (doughnut) | Active = any conversation in period |
-| **Claude Code Highlights** | Lines accepted, accept rate, top contributor | From Claude Code CSV export (May only) |
-| **Daily Trend** | Conversations per day for selected month | Daily count from conversations.json |
-| **Monthly Comparison** | All months side-by-side (always visible) | Fixed — not affected by month filter |
-| **Conversations per User** | Per-member bar chart, sorted by activity | Updates with month filter |
-| **Code Lines per User** | Developer productivity via Claude Code | From CSV — May only, fixed |
-| **Member Table** | Full breakdown with rank, convs, messages, avg depth, code, status | Dynamically sorted by selected month |
-| **Key Insights** | 3 narrative cards — adoption, ROI, opportunities | Static analysis written at report time |
-
-### Inactive Members Logic
-A member is marked inactive when:
-- They had **0 conversations** in the selected period, **AND**
-- Their **last activity** (chat or Claude Code combined) was **more than 14 days ago**
-
-This prevents recently-active developers (who use Claude Code more than chat) from being wrongly flagged.
+First push: also run `git checkout -b gh-pages` before pushing.
 
 ---
 
 ## Monthly Refresh Checklist
 
-Each month, to update the dashboard:
+- [ ] Export new ZIP (both teams if applicable) from claude.ai admin
+- [ ] Export new Members CSVs
+- [ ] Export Claude Code CSVs for the new month (both teams)
+- [ ] Run Python script on both ZIPs → get new convs/msgs/last dates
+- [ ] Add new month key to `convs`, `msgs`, `code`, `monthly`, `daily` in both P and S objects
+- [ ] Update `last` dates for Claude Code-active members
+- [ ] Update `CODE_HL` with new month's code totals
+- [ ] Add filter button for new month
+- [ ] Update `META` with new month label
+- [ ] Update `REPORT_DATE` and HTML header date
+- [ ] Update per-member spotlight cards if usage patterns changed
+- [ ] `git add index.html && git commit && git push origin gh-pages`
 
-- [ ] Export new ZIP from claude.ai → Settings → Account → Privacy
-- [ ] Export new Members CSV
-- [ ] Export new Claude Code CSV for the new month
-- [ ] Run the Python script to get new conversation/message counts
-- [ ] Add the new month to `CONVS`, `MSGS`, `MONTHLY`, `DAILY`, `META`
-- [ ] Update `LAST` dates (especially for Claude Code users)
-- [ ] Update `REPORT_DATE` in the JS: `var REPORT_DATE = new Date('YYYY-MM-DD');`
-- [ ] Update report date in the HTML header
-- [ ] Add new filter button for the new month
-- [ ] Push to GitHub → live in ~30 seconds
+---
+
+## Excluded Users (not in members list)
+
+These appeared in Claude Code CSV exports but were not in the members CSV. Their lines are excluded from totals. Investigate and add them if they are current team members.
+
+| User | Team | Months with activity |
+|---|---|---|
+| om.prakash@dhwaniris.com | Product | April (14,681 lines) |
+| fathima.nihala@dhwaniris.com | Product | April (601 lines) |
+| shlok@dhwaniris.com | Services | April (39,541 lines) |
+| vivek.kumar@dhwaniris.com | Services | April (1,453 lines), May (2,315 lines) |
 
 ---
 
