@@ -411,26 +411,14 @@ function buildTable(m) {
 
 function buildInactive(m) {
   var inactive = [];
-  var periodLabel;
+  var periodLabel = m === 'all' ? 'last 14 days' : META[m].label;
 
-  if (m === 'all') {
-    // All Time: inactive = last active more than 14 days ago (covers both chat + Claude Code)
-    periodLabel = 'last 14 days';
-    for (var i = 0; i < MEMBERS.length; i++) {
-      if (daysSince(LAST[i]) > 14) {
-        inactive.push({mbr:MEMBERS[i], last:LAST[i]});
-      }
-    }
-  } else {
-    // Monthly: inactive = 0 convs AND 0 code lines (for May where code data exists)
-    periodLabel = META[m].label;
-    var convs = CONVS[m];
-    for (var i = 0; i < MEMBERS.length; i++) {
-      var noConvs = convs[i] === 0;
-      var noCode  = (m === '2026-05') ? CODE[i] === 0 : true;
-      if (noConvs && noCode) {
-        inactive.push({mbr:MEMBERS[i], last:LAST[i]});
-      }
+  // Unified rule: inactive = 0 convs in period AND last active > 14 days ago
+  // This correctly handles code-first users (Abhijit) and recently active users (Nihaan)
+  var convs = m === 'all' ? CONVS['2026-06'] : CONVS[m];
+  for (var i = 0; i < MEMBERS.length; i++) {
+    if (convs[i] === 0 && daysSince(LAST[i]) > 14) {
+      inactive.push({mbr:MEMBERS[i], last:LAST[i]});
     }
   }
   // Sort by days inactive descending
