@@ -101,6 +101,8 @@ tr:hover td{background:#1e2130;}
 .code-note{background:rgba(107,138,253,.08);border:1px solid rgba(107,138,253,.2);border-radius:8px;padding:10px 16px;font-size:12px;color:var(--muted);margin-bottom:16px;}
 
 .footer{text-align:center;padding:32px 40px;color:var(--muted);font-size:12px;border-top:1px solid var(--border);margin-top:40px;}
+.explain{background:rgba(107,138,253,.06);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:12px 16px;font-size:12px;color:var(--muted);line-height:1.8;margin-bottom:16px;}
+.explain b{color:var(--text);font-weight:600;}
 </style>
 </head>
 <body>
@@ -131,6 +133,7 @@ tr:hover td{background:#1e2130;}
 <div class="container">
 
   <div class="sec">Overall Performance</div>
+  <div class="explain">These 5 numbers give a top-line view of the team's Claude usage. <b>Conversations</b> = total chat sessions started. <b>Messages Sent</b> = total prompts typed by team members. <b>AI Responses</b> = how many times Claude replied (should closely match messages). <b>Active Members</b> = people who had at least 1 conversation. <b>Inactive Members</b> = people with 0 conversations in the period AND no activity in the last 14 days — these are seats that may be underutilised.</div>
   <div class="kpi-grid">
     <div class="kpi"><div class="lbl">Total Conversations</div><div class="val" id="kConvs">1,189</div><div class="sub neu" id="kConvsSub">Apr 2 – Jun 4, 2026</div></div>
     <div class="kpi"><div class="lbl">Messages Sent</div><div class="val" id="kMsgs">8,968</div><div class="sub neu" id="kMsgsSub">Human prompts</div></div>
@@ -139,8 +142,9 @@ tr:hover td{background:#1e2130;}
     <div class="kpi" style="border-color:rgba(239,68,68,.3)"><div class="lbl">Inactive Members</div><div class="val" id="kInactive" style="color:var(--red)">0</div><div class="sub dn" id="kInactiveSub">No activity this period</div></div>
   </div>
 
+  <div class="explain" style="margin-top:20px;"><b>Inactive Members</b> lists team members who had zero conversations in the selected period AND whose last activity (chat or Claude Code) was more than 14 days ago. Color coding: 🔴 Red = 30+ days inactive (urgent), 🟠 Orange = 15–30 days, ⬜ Grey = within 14 days. The <b>Seat Utilisation</b> donut shows the active vs inactive split visually — useful for reporting seat ROI to leadership.</div>
   <!-- Inactive panel -->
-  <div class="two-col" style="margin-top:20px;">
+  <div class="two-col" style="margin-top:12px;">
     <div class="inactive-panel">
       <div class="inactive-hdr">
         <h3><span class="ibadge" id="iBadge">0</span> Inactive Members</h3>
@@ -155,6 +159,7 @@ tr:hover td{background:#1e2130;}
   </div>
 
   <div class="sec" id="codeSec">Claude Code Highlights — May 2026</div>
+  <div class="explain"><b>Claude Code</b> is the AI coding assistant used inside VS Code and terminal. <b>Lines of Code Accepted</b> = total AI-written code lines that developers kept (not rejected). <b>Suggestion Accept Rate</b> = what % of AI suggestions were accepted — 99.8% means the team trusts Claude's code almost completely. This data is only available for May 2026 as that's the export period — it stays fixed regardless of the month filter.</div>
   <div id="codeNote" class="code-note" style="display:none;"></div>
   <div class="hl-grid">
     <div class="hl gr"><div class="hl-lbl">Lines of Code Accepted</div><div class="hl-val">628,749</div><div class="hl-sub">AI-generated, developer-accepted</div></div>
@@ -164,18 +169,21 @@ tr:hover td{background:#1e2130;}
   </div>
 
   <div class="sec">Activity Trends</div>
+  <div class="explain"><b>Daily Conversations</b> shows how often the team uses Claude each day — peaks indicate high-demand periods (deadlines, sprints). Weekends naturally dip. Use this to spot engagement drops early. <b>Monthly Volume Comparison</b> always shows all 3 months side-by-side regardless of filter — useful for presenting month-on-month growth or decline to leadership. The bars show conversation count (left axis) and total messages (right axis).</div>
   <div class="two-col">
     <div class="chart-card"><h3 id="dTitle">Daily Conversations — All Time</h3><p id="dSub">Conversations per day across all team members</p><canvas id="dailyChart"></canvas></div>
     <div class="chart-card"><h3>Monthly Volume Comparison</h3><p>Conversations and messages by month — full overview</p><canvas id="monthlyChart"></canvas></div>
   </div>
 
   <div class="sec">User Engagement</div>
+  <div class="explain"><b>Conversations per User</b> ranks who uses Claude most for the selected month — this updates when you change the filter. High conversation count = high reliance on AI for day-to-day work. <b>Claude Code Lines per User</b> shows developer productivity specifically — a developer with few conversations but many code lines is a code-first user (uses Claude Code in terminal/IDE rather than the web chat). Both charts together give a complete picture of how each person uses AI.</div>
   <div class="two-col">
     <div class="chart-card"><h3 id="uTitle">Conversations per User — All Time</h3><p id="uSub">Conversations per team member for selected period</p><canvas id="userConvChart"></canvas></div>
     <div class="chart-card"><h3>Claude Code Lines — May 2026</h3><p>Lines of AI-generated code accepted per developer (May only)</p><canvas id="codeChart"></canvas></div>
   </div>
 
   <div class="sec">Member Activity Breakdown</div>
+  <div class="explain">A full per-member table sorted by conversations for the selected period. <b>Conversations</b> = chat sessions (progress bar shows relative share). <b>Messages Sent</b> = total prompts by that person. <b>Avg Msgs/Conv</b> = conversation depth — higher means longer, more complex sessions. <b>Code Lines (May)</b> = AI-written code accepted in May — 0 means the person doesn't use Claude Code. <b>Status</b> = Active if they had any conversation in the period, Inactive if zero conversations.</div>
   <div class="tbl-card">
     <div class="tbl-hdr"><h3>All Team Members</h3><span id="tCaption">Sorted by conversations · All Time</span></div>
     <table>
