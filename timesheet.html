@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>General Hours Dashboard — Apr & May 2026</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0f1117;--card:#1a1d27;--card2:#212536;--border:#2e3248;--blue:#6b8afd;--orange:#f97316;--green:#22c55e;--red:#ef4444;--purple:#a855f7;--yellow:#facc15;--text:#e2e8f0;--muted:#8892aa;--font:'Segoe UI',system-ui,sans-serif;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;}
+.header{background:linear-gradient(135deg,#1a1d27,#212536);border-bottom:1px solid var(--border);padding:24px 40px;display:flex;justify-content:space-between;align-items:center;}
+.header h1{font-size:22px;font-weight:700;color:#fff;}
+.header h1 span{color:var(--orange);}
+.meta{text-align:right;color:var(--muted);font-size:13px;line-height:1.8;}
+.meta strong{color:var(--text);}
+.container{max-width:1400px;margin:0 auto;padding:28px 40px;}
+.sec{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin:32px 0 14px;display:flex;align-items:center;gap:10px;}
+.sec::after{content:'';flex:1;height:1px;background:var(--border);}
+.explain{background:rgba(249,115,22,.05);border-left:3px solid var(--orange);border-radius:0 8px 8px 0;padding:11px 16px;font-size:12px;color:var(--muted);line-height:1.8;margin-bottom:14px;}
+.explain b{color:var(--text);}
+
+/* Filter */
+.filter-bar{background:var(--card);border-bottom:1px solid var(--border);padding:12px 40px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;}
+.filter-label{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.8px;text-transform:uppercase;width:100px;flex-shrink:0;}
+.fbtn{padding:6px 16px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:13px;font-family:var(--font);font-weight:500;transition:all .15s;}
+.fbtn:hover{color:var(--text);}
+.fbtn.act-both{background:var(--purple);border-color:var(--purple);color:#fff;font-weight:600;}
+.fbtn.act-apr{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:600;}
+.fbtn.act-may{background:var(--orange);border-color:var(--orange);color:#fff;font-weight:600;}
+.filter-note{margin-left:auto;font-size:12px;color:var(--muted);}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;}
+.kpi .lbl{font-size:12px;color:var(--muted);margin-bottom:6px;}
+.kpi .val{font-size:26px;font-weight:700;color:#fff;line-height:1;margin-bottom:5px;}
+.kpi .sub{font-size:12px;}
+.up{color:var(--red);} .dn{color:var(--green);} .neu{color:var(--muted);}
+
+/* Charts */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;}
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px;}
+.chart-card h3{font-size:14px;font-weight:600;margin-bottom:4px;}
+.chart-card p{font-size:12px;color:var(--muted);margin-bottom:18px;}
+.chart-card canvas{max-height:300px;}
+
+/* Table */
+.tbl-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.tbl-hdr{padding:16px 22px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.tbl-hdr h3{font-size:14px;font-weight:600;}
+table{width:100%;border-collapse:collapse;}
+th{text-align:left;font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);padding:9px 18px;background:#1e2130;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;white-space:nowrap;}
+th:hover{color:var(--text);}
+th.sort-active{color:var(--orange);}
+th.sort-active.sort-desc::after{content:' ↓';}
+th.sort-active.sort-asc::after{content:' ↑';}
+th:not(.sort-active)::after{content:' ↕';opacity:.3;}
+th.no-sort{cursor:default;}
+th.no-sort::after{content:'';}
+td{padding:10px 18px;font-size:13px;border-bottom:1px solid #1e2130;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#1e2130;}
+.chg-dn{color:var(--green);font-size:12px;}
+.chg-up{color:var(--red);font-size:12px;}
+.chg-new{color:var(--orange);font-size:12px;}
+.chg-gone{color:var(--muted);font-size:12px;}
+.chg-neu{color:var(--muted);font-size:12px;}
+.pb-wrap{display:flex;align-items:center;gap:8px;}
+.pb{height:5px;background:var(--border);border-radius:3px;width:80px;overflow:hidden;flex-shrink:0;}
+.pb .fill{height:100%;border-radius:3px;}
+.badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600;}
+.badge-high{background:rgba(239,68,68,.12);color:var(--red);}
+.badge-med{background:rgba(249,115,22,.12);color:var(--orange);}
+.badge-low{background:rgba(34,197,94,.1);color:var(--green);}
+.footer{text-align:center;padding:24px 40px;color:var(--muted);font-size:12px;border-top:1px solid var(--border);margin-top:32px;}
+
+/* Insight cards */
+.insight-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.ic{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;border-top:3px solid var(--orange);}
+.ic h3{font-size:15px;font-weight:600;margin-bottom:10px;}
+.ic p{font-size:12px;color:var(--muted);line-height:1.8;}
+.ic strong{color:var(--text);}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:5px;letter-spacing:1px;text-transform:uppercase;">Dhwani Rural Information Systems</div>
+    <h1>General Hours <span>Timesheet Dashboard</span></h1>
+    <div style="font-size:13px;color:var(--muted);margin-top:3px;" id="hSub">April & May 2026 — General Tasks Internal (DHW/P081)</div>
+  </div>
+  <div class="meta">
+    <div><strong>Report Date:</strong> June 5, 2026</div>
+    <div><strong>Project:</strong> DHW/P081 — General Tasks Internal</div>
+    <div><strong>Purpose:</strong> Track non-billable general hour submissions</div>
+  </div>
+</div>
+
+<div class="filter-bar">
+  <span class="filter-label">View Month</span>
+  <button class="fbtn act-both" id="fbtn-both" onclick="setFilter('both')">Both Months</button>
+  <button class="fbtn" id="fbtn-apr"  onclick="setFilter('apr')">April 2026</button>
+  <button class="fbtn" id="fbtn-may"  onclick="setFilter('may')">May 2026</button>
+  <div class="filter-note" id="fNote">Showing: Both Months</div>
+</div>
+
+<div class="container">
+
+  <div class="sec">Overview</div>
+  <div class="explain"><b>General Hours</b> = time submitted under DHW/P081 (General Tasks Internal). These are non-billable hours — ideally they should be minimal. A downward trend is positive. <b>Bench time</b> (employee idle) is the most critical sub-category to watch.</div>
+  <div class="kpi-grid">
+    <div class="kpi"><div class="lbl">April — Total General Days</div><div class="val" id="kApr">243.3</div><div class="sub neu">61 employees · 795 entries</div></div>
+    <div class="kpi"><div class="lbl">May — Total General Days</div><div class="val" id="kMay">151.9</div><div class="sub dn" id="kMaySub">↓ 37.5% vs April</div></div>
+    <div class="kpi" style="border-color:rgba(34,197,94,.3)"><div class="lbl">Days Reduced</div><div class="val" style="color:var(--green)">91.4</div><div class="sub dn">↓ fewer general days in May</div></div>
+    <div class="kpi" style="border-color:rgba(239,68,68,.3)"><div class="lbl">Bench Time Apr</div><div class="val" style="color:var(--red)">23.4</div><div class="sub up">↑ 9.6% of April general hours</div></div>
+    <div class="kpi" style="border-color:rgba(34,197,94,.3)"><div class="lbl">Bench Time May</div><div class="val" style="color:var(--green)">0.75</div><div class="sub dn">↓ 96.8% drop from April</div></div>
+  </div>
+
+  <div class="sec">Activity Breakdown</div>
+  <div class="two-col">
+    <div class="chart-card">
+      <h3 id="actTitle">Where Are General Hours Going? — Both Months</h3>
+      <p>Breakdown by activity type for selected period</p>
+      <canvas id="actChart"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>April vs May — Total General Days by Category</h3>
+      <p>Month-on-month change per activity type</p>
+      <canvas id="compareChart"></canvas>
+    </div>
+  </div>
+
+  <div class="sec">Top General Hour Submitters</div>
+  <div class="two-col">
+    <div class="chart-card">
+      <h3 id="topTitle">Top 15 Employees — General Days Logged</h3>
+      <p id="topSub">Sorted by total general days. High hours = needs attention from management.</p>
+      <canvas id="topChart"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Employees Who Moved Off General (Positive)</h3>
+      <p>Had significant general hours in April, zero or near-zero in May — likely moved to billable work.</p>
+      <canvas id="movedOffChart"></canvas>
+    </div>
+  </div>
+
+  <div class="sec">Employee Breakdown Table</div>
+  <div class="explain"><b>Alert levels:</b> <span style="color:var(--red)">High ≥ 5 days</span> in a month warrants a conversation. <span style="color:var(--orange)">Medium 2–5 days</span> is within acceptable range. <span style="color:var(--green)">Low &lt; 2 days</span> is fine.</div>
+  <div class="tbl-card">
+    <div class="tbl-hdr">
+      <h3>All Employees — General Hours Log</h3>
+      <span id="tCaption" style="font-size:12px;color:var(--muted);">Sorted by April days · Both Months</span>
+    </div>
+    <table>
+      <thead><tr>
+        <th class="no-sort">#</th>
+        <th onclick="sortTbl('name')" id="th-name">Employee</th>
+        <th class="no-sort">Job Title</th>
+        <th onclick="sortTbl('apr')" id="th-apr" class="sort-active sort-desc">April Days</th>
+        <th onclick="sortTbl('may')" id="th-may">May Days</th>
+        <th onclick="sortTbl('total')" id="th-total">Total Days</th>
+        <th onclick="sortTbl('chg')" id="th-chg">Change</th>
+        <th class="no-sort">Apr Alert</th>
+        <th class="no-sort">May Alert</th>
+      </tr></thead>
+      <tbody id="tBody"></tbody>
+    </table>
+  </div>
+
+  <div class="sec">Key Insights</div>
+  <div class="insight-grid">
+    <div class="ic" style="border-top-color:var(--green)">
+      <h3 style="color:var(--green)">✦ Strong Improvement Month-on-Month</h3>
+      <p>Total general days fell from <strong>243.3 (April)</strong> to <strong>151.9 (May)</strong> — a <strong>37.5% reduction</strong>. This means 91 fewer non-billable days in May, signalling better project allocation or improved discipline in timesheet submissions.</p>
+    </div>
+    <div class="ic" style="border-top-color:var(--green)">
+      <h3 style="color:var(--green)">✦ Bench Time Nearly Eliminated</h3>
+      <p>Bench hours dropped from <strong>23.4 days (April)</strong> to just <strong>0.75 days (May)</strong> — a 96.8% reduction. This is the strongest positive signal: idle employees have been deployed to projects. Bench time should remain near zero going forward.</p>
+    </div>
+    <div class="ic" style="border-top-color:var(--orange)">
+      <h3 style="color:var(--orange)">✦ Meetings = 63% of General Time</h3>
+      <p><strong>Discussions / Meeting</strong> and <strong>Internal Discussions/Meetings</strong> together account for ~63% of all general hours in both months. While some meetings are necessary, this proportion warrants reviewing which recurring meetings can be reduced or made more efficient.</p>
+    </div>
+    <div class="ic" style="border-top-color:var(--blue)">
+      <h3 style="color:var(--blue)">✦ Several Moved to Billable (Positive)</h3>
+      <p>Employees like <strong>Shubhiksha Khandelwal</strong> (21.4 → 0), <strong>Osama Islam</strong> (14.6 → 0), <strong>Shlok</strong> (14 → 0), <strong>Priyambada Pandey</strong> (13.4 → 0) and <strong>Rekha Ghangal</strong> (10.2 → 0) had high April general hours but zero in May — very likely moved to billable projects.</p>
+    </div>
+    <div class="ic" style="border-top-color:var(--red)">
+      <h3 style="color:var(--red)">✦ Persistent High Submitters — Need Attention</h3>
+      <p><strong>Abhijit Nair</strong> (22 Apr, 19 May), <strong>Kandhi Omprakash</strong> (19.4 Apr, 16.1 May) consistently log very high general hours across both months. These need a review conversation — are they on a project or in a holding pattern?</p>
+    </div>
+    <div class="ic" style="border-top-color:var(--purple)">
+      <h3 style="color:var(--purple)">✦ New High Submitters in May</h3>
+      <p><strong>Aditi Baitule Deshpande</strong> jumped from 4 → 18.9 days and <strong>Suraj Singh</strong> from 2.9 → 12.7 days in May. These sharp increases warrant checking — are they between projects, or is something specific driving the spike?</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">Dhwani Rural Information Systems &nbsp;|&nbsp; General Hours Timesheet Dashboard &nbsp;|&nbsp; June 5, 2026 &nbsp;|&nbsp; Source: General Tasks Timesheet Report (DHW/P081)</div>
+
+<script>
+var BL='#6b8afd',OR='#f97316',GR='#22c55e',PU='#a855f7',RE='#ef4444',YL='#facc15',GRID='#2e3248',TX='#8892aa';
+Chart.defaults.color=TX; Chart.defaults.borderColor=GRID; Chart.defaults.font.family="'Segoe UI',system-ui,sans-serif";
+
+// ── DATA ─────────────────────────────────────────────────────────────────────
+var EMPLOYEES = [
+  {name:'Abhijit Nair',                 title:'Engineering Manager',           apr:22.0,    may:19.0},
+  {name:'Shubhiksha Khandelwal',         title:'Project Analyst',               apr:21.39,   may:0},
+  {name:'Kandhi Omprakash',             title:'SDE 3 - Full Stack',            apr:19.375,  may:16.125},
+  {name:'Osama Islam',                  title:'SDE 1 - Frontend',              apr:14.562,  may:0},
+  {name:'Shlok',                        title:'Data Scientist',                apr:14.0,    may:0},
+  {name:'Priyambada Pandey',            title:'QA - Intern',                   apr:13.438,  may:0},
+  {name:'Rekha Ghangal',                title:'Data Engineer',                 apr:10.15,   may:0},
+  {name:'Fahimuddin Sayyed',            title:'Project Analyst',               apr:7.562,   may:3.188},
+  {name:'Shweta Singh',                 title:'Sr. Project Manager',           apr:6.938,   may:5.375},
+  {name:'Anup Kumar Srivastav',         title:'Team Lead - Full stack',        apr:6.625,   may:3.513},
+  {name:'Pranjali jain',                title:'Project Analyst - Intern',      apr:6.25,    may:0},
+  {name:'Shwetank Seth',                title:'Associate Project Manager',     apr:5.812,   may:0},
+  {name:'Muskan Khan',                  title:'Project Analyst',               apr:5.731,   may:5.625},
+  {name:'Bhushan Anilrao Barbuddhe',    title:'Team Lead',                     apr:5.312,   may:1.188},
+  {name:'Aditi Baitule Deshpande',      title:'Sr. Project Manager',           apr:4.0,     may:18.938},
+  {name:'Ritesh Negi',                  title:'Data Analyst',                  apr:4.688,   may:3.938},
+  {name:'Harshdeep Singh Mokha',        title:'Sr. Project Manager',           apr:4.094,   may:5.0},
+  {name:'Abhishek Prajapati',           title:'Flutter Developer - Intern',    apr:4.037,   may:2.688},
+  {name:'Shrey Jain',                   title:'Team Lead',                     apr:3.781,   may:2.131},
+  {name:'Aakash Sharma',               title:'SDE 1 - Frontend',              apr:3.625,   may:0},
+  {name:'Pranati Tiwari',               title:'Associate Project Manager',     apr:3.594,   may:2.656},
+  {name:'Akshat Verma',                 title:'Product Analyst',               apr:3.562,   may:0.125},
+  {name:'Sparsh Verma',                 title:'SDE 1 - Frappe',               apr:3.375,   may:0},
+  {name:'Suraj Singh',                  title:'SDE 1 - Full Stack',            apr:2.875,   may:12.688},
+  {name:'Sureshkumar Mali',             title:'Team Lead - Full stack',        apr:2.9,     may:0.688},
+  {name:'Debopriyo Dey',                title:'QA - Intern',                   apr:2.875,   may:0},
+  {name:'Sachin Vinod Rathod',          title:'QA Engineer',                   apr:2.812,   may:3.812},
+  {name:'Krishna Maheshwari',           title:'Associate Project Manager',     apr:2.812,   may:3.188},
+  {name:'Samarth Paul',                 title:'Associate Project Manager',     apr:2.531,   may:2.281},
+  {name:'Vanshika Sehgal',              title:'SDE 1 - Full Stack',            apr:2.5,     may:3.312},
+  {name:'Raman Mishra',                 title:'SDE 1 - Mobile Developer',      apr:2.5,     may:0.375},
+  {name:'Kashish Talwani',              title:'Associate Project Manager',      apr:2.375,   may:4.062},
+  {name:'Pragat Singh',                 title:'Team Lead - Java',              apr:2.25,    may:3.625},
+  {name:'Vishwa Patel',                 title:'Engagement Manager',            apr:2.188,   may:0},
+  {name:'Sachin Sharma',                title:'Data Engineer',                 apr:2.0,     may:1.25},
+  {name:'Tabseer Khan',                 title:'Data Engineer',                 apr:0.812,   may:3.25},
+  {name:'Mayur Sharma',                 title:'Associate Project Manager',     apr:0.75,    may:3.256},
+  {name:'Devang Bhatnagar',             title:'SDE 1 - Frappe',               apr:1.619,   may:3.15},
+  {name:'Rohit SIngh (Frappe Intern)',  title:'Frappe - Intern',              apr:1.875,   may:0},
+  {name:'Pooja Srivastava',             title:'Project Analyst',               apr:1.75,    may:1.406},
+  {name:'Harshit Sodhani',              title:'SDE 1 - Full Stack',            apr:1.069,   may:0.531},
+  {name:'Bhanu Marwah',                 title:'Data Engineer',                 apr:1.056,   may:0.556},
+  {name:'Brahmjyot Singh',              title:'Product Analyst',               apr:1.0,     may:0.188},
+  {name:'Samarth Rana',                 title:'Project Analyst',               apr:1.0,     may:2.913},
+  {name:'Navneet Patteri',              title:'SDE 1 - Frappe',               apr:0.938,   may:1.5},
+  {name:'Himanshi Sharma',              title:'Sr. Project Manager',           apr:0.875,   may:1.0},
+  {name:'Dalbeer Kaur',                 title:'Sr. QA Engineer',              apr:0.875,   may:2.062},
+  {name:'Nagesh Kashinath Koli',        title:'Project Analyst',               apr:0.812,   may:0},
+  {name:'Chitranshi Jain',              title:'Project Analyst',               apr:0.812,   may:0.125},
+  {name:'Rohit Singh (Sr. Data Eng)',   title:'Sr. Data Engineer',            apr:0.562,   may:0.688},
+  {name:'Hrushikesh Deodhar',           title:'SDE 1 - PHP',                  apr:0.438,   may:0.25},
+  {name:'Aman Sharma',                  title:'Project Analyst',               apr:0.375,   may:0},
+  {name:'Arpita Jain',                  title:'Project Manager',               apr:0.375,   may:0.375},
+  {name:'Aditya Gore',                  title:'Team Lead - Full stack',        apr:0.375,   may:0},
+  {name:'Namandeep',                    title:'Project Analyst',               apr:0.312,   may:0.438},
+  {name:'Ankit Yadav',                  title:'SDE 1 - PHP',                  apr:0.25,    may:0.062},
+  {name:'Fahad',                        title:'SDE 2 - Backend',              apr:0.25,    may:0},
+  {name:'Amandeep Singh',               title:'Sr. QA Engineer',              apr:0.25,    may:0.438},
+  {name:'Aastha Arora',                 title:'Sr. Project Manager',           apr:0.125,   may:0},
+  {name:'Sunchay Singhal',              title:'Project Analyst - Consultant',  apr:0.125,   may:0.5},
+  {name:'Bhanu Prakash',                title:'SDE 1 - Full Stack',            apr:0.062,   may:0.375},
+  {name:'Nadge Sachin Laxi',            title:'SDE 1 - Backend',              apr:0,       may:3.0},
+  {name:'Muskan Khan (May new)',         title:'Project Analyst',               apr:0,       may:0},
+  {name:'Deepak Bharti',                title:'Data Engineer',                 apr:0,       may:0.375},
+  {name:'Vivek Kumar Singh',            title:'Team Lead - Full stack',        apr:0,       may:0.625},
+  {name:'Sushant Singh',                title:'QA Engineer',                   apr:0,       may:0.075},
+  {name:'Harshdeep Singh Mokha',        title:'Sr. Project Manager',           apr:0,       may:0}
+];
+
+// Clean duplicates, remove zero-zero rows
+var DATA = EMPLOYEES.filter(function(e){return e.apr > 0 || e.may > 0;});
+
+var ACT_APR = {
+  'Meetings & Discussions': 85.15+68.04,
+  'Software - POC':         42.94,
+  'Bench':                  23.35,
+  'Employee Onboarding':    7.94,
+  'Dhwani Events':          3.25,
+  'Field Visit':            3.0,
+  'Common Code/Standards':  3.62,
+  'KRA':                    1.78,
+  'Project Management':     1.75,
+  'Demo':                   1.13,
+  'Interviews':             0.62,
+  'Config / Docs':          0.44,
+  'Software - Development': 0.25
+};
+var ACT_MAY = {
+  'Meetings & Discussions': 57.99+41.76,
+  'Software - POC':         33.44,
+  'Dhwani Events':          9.22,
+  'Field Visit':            5.12,
+  'KRA':                    0.91,
+  'Employee Onboarding':    0.88,
+  'Bench':                  0.75,
+  'Config / Docs':          0.75,
+  'Demo':                   0.69,
+  'Common Code/Standards':  0.28,
+  'Interviews':             0.12
+};
+
+var curFilter = 'both';
+var sortCol = 'apr', sortDir = 'desc';
+
+// ── ACTIVITY CHART ─────────────────────────────────────────────────────────
+var actInst = null;
+function buildActChart(){
+  var data, total, title;
+  if(curFilter==='apr'){
+    data=ACT_APR; total=243.26; title='Where Are General Hours Going? — April 2026';
+  } else if(curFilter==='may'){
+    data=ACT_MAY; total=151.91; title='Where Are General Hours Going? — May 2026';
+  } else {
+    // Combined
+    var combined={};
+    var allKeys=Object.keys(ACT_APR).concat(Object.keys(ACT_MAY));
+    allKeys.forEach(function(k){combined[k]=(ACT_APR[k]||0)+(ACT_MAY[k]||0);});
+    data=combined; total=395.17; title='Where Are General Hours Going? — Both Months';
+  }
+  var labels=Object.keys(data).filter(function(k){return data[k]>0;}).sort(function(a,b){return data[b]-data[a];});
+  var vals=labels.map(function(k){return Math.round(data[k]*100)/100;});
+  var colors=[OR,BL,RE,GR,PU,YL,'#06b6d4','#ec4899','#84cc16','#f43f5e','#8b5cf6','#14b8a6','#fb923c'];
+
+  if(actInst) actInst.destroy();
+  actInst=new Chart(document.getElementById('actChart'),{
+    type:'doughnut',
+    data:{labels:labels,datasets:[{data:vals,backgroundColor:colors.slice(0,labels.length),borderColor:'#1a1d27',borderWidth:2,hoverOffset:6}]},
+    options:{responsive:true,maintainAspectRatio:true,cutout:'55%',
+      plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10},padding:8}},
+        tooltip:{callbacks:{label:function(ctx){var pct=Math.round(ctx.parsed/total*100);return' '+ctx.parsed+' days ('+pct+'%)';}}}}}
+  });
+  document.getElementById('actTitle').textContent=title;
+}
+
+// ── COMPARE CHART (static) ──────────────────────────────────────────────────
+var compareKeys=['Meetings &\nDiscussions','Software\n- POC','Bench','Employee\nOnboarding','Dhwani\nEvents','Field\nVisit','Common\nCode','KRA'];
+var compareApr=[85.15+68.04, 42.94, 23.35, 7.94, 3.25, 3.0, 3.62, 1.78];
+var compareMay=[57.99+41.76, 33.44, 0.75,  0.88, 9.22, 5.12, 0.28, 0.91];
+
+new Chart(document.getElementById('compareChart'),{
+  type:'bar',
+  data:{labels:compareKeys,
+    datasets:[
+      {label:'April 2026',data:compareApr,backgroundColor:BL+'cc',borderRadius:4,borderSkipped:false},
+      {label:'May 2026',  data:compareMay,backgroundColor:OR+'cc',borderRadius:4,borderSkipped:false}
+    ]},
+  options:{responsive:true,maintainAspectRatio:true,
+    plugins:{legend:{position:'top',labels:{boxWidth:12,font:{size:12}}}},
+    scales:{x:{grid:{color:GRID},ticks:{font:{size:10},maxRotation:0}},y:{grid:{color:GRID},beginAtZero:true,title:{display:true,text:'Days'}}}}
+});
+
+// ── TOP CHART ───────────────────────────────────────────────────────────────
+var topInst = null;
+function buildTopChart(){
+  var sorted, title;
+  if(curFilter==='apr'){
+    sorted=DATA.slice().sort(function(a,b){return b.apr-a.apr;}).slice(0,15);
+    title='Top 15 Employees — April 2026 General Days';
+  } else if(curFilter==='may'){
+    sorted=DATA.slice().sort(function(a,b){return b.may-a.may;}).slice(0,15);
+    title='Top 15 Employees — May 2026 General Days';
+  } else {
+    sorted=DATA.map(function(e){return{name:e.name,val:e.apr+e.may};}).sort(function(a,b){return b.val-a.val;}).slice(0,15);
+    title='Top 15 Employees — Combined General Days';
+  }
+  var labels=sorted.map(function(e){var p=e.name.split(' ');return p[0]+(p[1]?' '+p[1][0]+'.':'');});
+  var vals=curFilter==='both'?sorted.map(function(e){return e.val;}):sorted.map(function(e){return curFilter==='apr'?e.apr:e.may;});
+  var colors=vals.map(function(v){return v>=5?(RE+'cc'):v>=2?(OR+'cc'):(GR+'cc');});
+
+  if(topInst) topInst.destroy();
+  topInst=new Chart(document.getElementById('topChart'),{
+    type:'bar',
+    data:{labels:labels,datasets:[{label:'General Days',data:vals,backgroundColor:colors,borderRadius:4,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:true,indexAxis:'y',
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return' '+ctx.parsed.x.toFixed(2)+' days';}}}},
+      scales:{x:{grid:{color:GRID},beginAtZero:true},y:{grid:{display:false},ticks:{font:{size:10}}}}}
+  });
+  document.getElementById('topTitle').textContent=title;
+}
+
+// ── MOVED OFF CHART (static) ────────────────────────────────────────────────
+var movedOff=[
+  {name:'Shubhiksha K.',   apr:21.39},
+  {name:'Osama Islam',     apr:14.56},
+  {name:'Shlok',           apr:14.0},
+  {name:'Priyambada P.',   apr:13.44},
+  {name:'Rekha Ghangal',   apr:10.15},
+  {name:'Shwetank Seth',   apr:5.81},
+  {name:'Pranjali Jain',   apr:6.25},
+  {name:'Aakash Sharma',   apr:3.63},
+  {name:'Sparsh Verma',    apr:3.38},
+  {name:'Debopriyo Dey',   apr:2.88}
+];
+new Chart(document.getElementById('movedOffChart'),{
+  type:'bar',
+  data:{labels:movedOff.map(function(e){return e.name;}),
+    datasets:[
+      {label:'April Days',data:movedOff.map(function(e){return e.apr;}),backgroundColor:BL+'cc',borderRadius:4,borderSkipped:false},
+      {label:'May Days',  data:movedOff.map(function(e){return 0;}),backgroundColor:GR+'cc',borderRadius:4,borderSkipped:false}
+    ]},
+  options:{responsive:true,maintainAspectRatio:true,
+    plugins:{legend:{position:'top',labels:{boxWidth:12,font:{size:12}}},
+      tooltip:{callbacks:{label:function(ctx){return' '+ctx.parsed.y.toFixed(2)+' days';}}}},
+    scales:{x:{grid:{color:GRID},ticks:{font:{size:10},maxRotation:30}},y:{grid:{color:GRID},beginAtZero:true,title:{display:true,text:'Days'}}}}
+});
+
+// ── TABLE ────────────────────────────────────────────────────────────────────
+function alertBadge(days){
+  if(days>=5)  return '<span class="badge badge-high">High</span>';
+  if(days>=2)  return '<span class="badge badge-med">Medium</span>';
+  if(days>0)   return '<span class="badge badge-low">Low</span>';
+  return '<span style="color:var(--muted);font-size:11px;">—</span>';
+}
+function chgLabel(apr, may){
+  if(apr===0 && may>0) return '<span class="chg-new">★ New May</span>';
+  if(may===0 && apr>0) return '<span class="chg-gone">→ 0 (billable?)</span>';
+  var pct=Math.round((may-apr)/apr*100);
+  if(pct<=-20) return '<span class="chg-dn">↓ '+Math.abs(pct)+'%</span>';
+  if(pct>=20)  return '<span class="chg-up">↑ '+pct+'%</span>';
+  return '<span class="chg-neu">~ stable</span>';
+}
+
+var tSortCol='apr', tSortDir='desc';
+function sortTbl(col){
+  if(tSortCol===col){ tSortDir=tSortDir==='desc'?'asc':'desc'; }
+  else{ tSortCol=col; tSortDir='desc'; }
+  ['name','apr','may','total','chg'].forEach(function(c){
+    var el=document.getElementById('th-'+c);
+    if(!el) return;
+    el.className=(c===tSortCol?'sort-active sort-'+tSortDir:'');
+  });
+  buildTable();
+}
+
+function buildTable(){
+  var rows=DATA.slice();
+  rows.sort(function(a,b){
+    var v=0;
+    if(tSortCol==='name')  v=a.name.localeCompare(b.name);
+    else if(tSortCol==='apr')   v=a.apr-b.apr;
+    else if(tSortCol==='may')   v=a.may-b.may;
+    else if(tSortCol==='total') v=(a.apr+a.may)-(b.apr+b.may);
+    else if(tSortCol==='chg'){
+      var ca=a.apr>0?(a.may-a.apr)/a.apr:1;
+      var cb=b.apr>0?(b.may-b.apr)/b.apr:1;
+      v=ca-cb;
+    }
+    return tSortDir==='desc'?-v:v;
+  });
+
+  var maxApr=Math.max.apply(null,DATA.map(function(e){return e.apr;}))||1;
+  var maxMay=Math.max.apply(null,DATA.map(function(e){return e.may;}))||1;
+  var html='';
+  rows.forEach(function(e,idx){
+    var total=Math.round((e.apr+e.may)*100)/100;
+    html+='<tr>';
+    html+='<td style="color:var(--muted);font-size:12px;">'+(idx+1)+'</td>';
+    html+='<td style="font-weight:600">'+e.name+'</td>';
+    html+='<td style="color:var(--muted);font-size:12px;">'+e.title+'</td>';
+    html+='<td><div class="pb-wrap"><div class="pb"><div class="fill" style="width:'+Math.round(e.apr/maxApr*100)+'%;background:'+BL+'"></div></div><span style="font-size:12px;color:var(--text);min-width:36px;text-align:right">'+e.apr.toFixed(2)+'</span></div></td>';
+    html+='<td><div class="pb-wrap"><div class="pb"><div class="fill" style="width:'+Math.round(e.may/maxMay*100)+'%;background:'+OR+'"></div></div><span style="font-size:12px;color:var(--text);min-width:36px;text-align:right">'+e.may.toFixed(2)+'</span></div></td>';
+    html+='<td style="font-weight:600">'+total+'</td>';
+    html+='<td>'+chgLabel(e.apr,e.may)+'</td>';
+    html+='<td>'+alertBadge(e.apr)+'</td>';
+    html+='<td>'+alertBadge(e.may)+'</td>';
+    html+='</tr>';
+  });
+  document.getElementById('tBody').innerHTML=html;
+  document.getElementById('tCaption').textContent='Sorted by '+tSortCol+' ('+tSortDir+') · '+(curFilter==='both'?'Both Months':curFilter==='apr'?'April 2026':'May 2026');
+}
+
+// ── KPI UPDATE ───────────────────────────────────────────────────────────────
+function updateKPIs(){
+  if(curFilter==='apr'){
+    document.getElementById('kApr').style.color='#fff';
+    document.getElementById('kMay').style.color='var(--muted)';
+  } else if(curFilter==='may'){
+    document.getElementById('kApr').style.color='var(--muted)';
+    document.getElementById('kMay').style.color='#fff';
+  } else {
+    document.getElementById('kApr').style.color='#fff';
+    document.getElementById('kMay').style.color='#fff';
+  }
+}
+
+// ── FILTER ────────────────────────────────────────────────────────────────────
+function setFilter(f){
+  curFilter=f;
+  ['both','apr','may'].forEach(function(k){
+    document.getElementById('fbtn-'+k).className='fbtn'+(k===f?' act-'+k:'');
+  });
+  var label=f==='both'?'Both Months':f==='apr'?'April 2026':'May 2026';
+  document.getElementById('fNote').textContent='Showing: '+label;
+  updateKPIs();
+  buildActChart();
+  buildTopChart();
+  buildTable();
+}
+
+// Init
+buildActChart();
+buildTopChart();
+buildTable();
+</script>
+</body>
+</html>
