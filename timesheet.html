@@ -195,6 +195,20 @@ tr:hover td{background:#1e2130;}
   </div>
 </div>
 
+  <!-- Activity x Employee cross-tab -->
+  <div class="sec">Activity-wise · Employee-wise Breakdown</div>
+  <div class="explain"><b>Each row = one employee. Each column = one activity type.</b> Values are days logged. Zero values are hidden (—). Filter by month using the buttons above. Click any column header to sort.</div>
+  <div style="overflow-x:auto;border-radius:12px;border:1px solid var(--border);">
+    <table id="crossTab" style="min-width:1100px;">
+      <thead>
+        <tr id="crossHead"></tr>
+      </thead>
+      <tbody id="crossBody"></tbody>
+    </table>
+  </div>
+
+</div>
+
 <div class="footer">Dhwani RIS &nbsp;|&nbsp; General Hours Dashboard &nbsp;|&nbsp; June 5, 2026 &nbsp;|&nbsp; Source: General Tasks Timesheet Report (DHW/P081)</div>
 
 <script>
@@ -449,11 +463,231 @@ function setFilter(f){
   buildActChart();
   buildTopChart();
   buildTable();
+  buildCrossTab();
+}
+
+// ── ACTIVITY x EMPLOYEE CROSS-TAB ────────────────────────────────────────────
+var CROSS_APR = [
+  {name:'Abhijit Nair',              title:'Engineering Manager',          mtg:22.0,   poc:0,     bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Kandhi Omprakash',          title:'SDE 3 - Full Stack',           mtg:0,      poc:19.375,bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Fahimuddin Sayyed',         title:'Project Analyst',              mtg:6.625,  poc:0.625, bench:0,    onboard:0,    code:0,     events:0.063,visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0.25, dev:0},
+  {name:'Shweta Singh',              title:'Sr. Project Manager',          mtg:4.313,  poc:1.188, bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:1.125,mgmt:0,   demo:0.313,intv:0,  cfg:0,    dev:0},
+  {name:'Anup Kumar Srivastav',      title:'Team Lead - Full stack',       mtg:6.625,  poc:0,     bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Bhushan Anilrao Barbuddhe', title:'Team Lead',                    mtg:2.688,  poc:0,     bench:0,    onboard:0,    code:0.875, events:0,    visit:1.75,kra:0,   mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Ritesh Negi',               title:'Data Analyst',                 mtg:3.813,  poc:0.875, bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Abhishek Prajapati',        title:'Flutter Developer - Intern',   mtg:3.663,  poc:0,     bench:0,    onboard:0,    code:0,     events:0.375,visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Aditi Baitule Deshpande',   title:'Sr. Project Manager',          mtg:0,      poc:0,     bench:0,    onboard:4.0,  code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Harshdeep Singh Mokha',     title:'Sr. Project Manager',          mtg:2.719,  poc:0.125, bench:0,    onboard:0,    code:0,     events:0.313,visit:0,  kra:0.188,mgmt:0,   demo:0.25,intv:0.25,cfg:0,   dev:0},
+  {name:'Shrey Jain',                title:'Team Lead',                    mtg:3.688,  poc:0,     bench:0,    onboard:0,    code:0,     events:0.094,visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Pranati Tiwari',            title:'Associate Project Manager',    mtg:3.313,  poc:0,     bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0.281,mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Akshat Verma',              title:'Product Analyst',              mtg:3.563,  poc:0,     bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Sparsh Verma',              title:'SDE 1 - Frappe',               mtg:1.688,  poc:0.25,  bench:0,    onboard:0,    code:1.188, events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0.25},
+  {name:'Sureshkumar Mali',          title:'Team Lead - Full stack',       mtg:2.9,    poc:0,     bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Suraj Singh',               title:'SDE 1 - Full Stack',           mtg:0.313,  poc:0.875, bench:0,    onboard:0,    code:1.563, events:0.125,visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Sachin Vinod Rathod',       title:'QA Engineer',                  mtg:2.813,  poc:0,     bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Krishna Maheshwari',        title:'Associate Project Manager',    mtg:2.063,  poc:0,     bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0.75,demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Vanshika Sehgal',           title:'SDE 1 - Full Stack',           mtg:2.5,    poc:0,     bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Raman Mishra',              title:'SDE 1 - Mobile Developer',     mtg:0.875,  poc:0,     bench:0,    onboard:0,    code:0,     events:0.375,visit:0.5,kra:0,    mgmt:0.75,demo:0.375,intv:0,  cfg:0,    dev:0},
+  {name:'Kashish Talwani',           title:'Associate Project Manager',    mtg:2.375,  poc:0,     bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Pragat Singh',              title:'Team Lead - Java',             mtg:2.25,   poc:0,     bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Vishwa Patel',              title:'Engagement Manager',           mtg:0.188,  poc:0,     bench:0,    onboard:2.0,  code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Samarth Paul',              title:'Associate Project Manager',    mtg:1.438,  poc:0,     bench:0,    onboard:0,    code:0,     events:0.188,visit:0,  kra:0.375,mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Sachin Sharma',             title:'Data Engineer',                mtg:1.313,  poc:0,     bench:0,    onboard:0,    code:0,     events:0.625,visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0.063,dev:0},
+  {name:'Rohit SIngh (Intern)',      title:'Frappe - Intern',              mtg:1.875,  poc:0,     bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Pooja Srivastava',          title:'Project Analyst',              mtg:1.625,  poc:0,     bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0.125,dev:0},
+  {name:'Devang Bhatnagar',          title:'SDE 1 - Frappe',               mtg:1.619,  poc:0,     bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Harshit Sodhani',           title:'SDE 1 - Full Stack',           mtg:0.913,  poc:0,     bench:0,    onboard:0,    code:0,     events:0.156,visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Bhanu Marwah',              title:'Data Engineer',                mtg:1.056,  poc:0,     bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Brahmjyot Singh',           title:'Product Analyst',              mtg:0,      poc:0,     bench:0,    onboard:0,    code:0,     events:0.25, visit:0.75,kra:0,   mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Samarth Rana',              title:'Project Analyst',              mtg:1.0,    poc:0,     bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Navneet Patteri',           title:'SDE 1 - Frappe',               mtg:0.938,  poc:0,     bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Himanshi Sharma',           title:'Sr. Project Manager',          mtg:0.438,  poc:0,     bench:0,    onboard:0.25, code:0,     events:0,    visit:0,  kra:0.188,mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Dalbeer Kaur',              title:'Sr. QA Engineer',              mtg:0.875,  poc:0,     bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Nagesh Kashinath Koli',     title:'Project Analyst',              mtg:0,      poc:0,     bench:0.688,onboard:0,    code:0,     events:0.125,visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Tabseer Khan',              title:'Data Engineer',                mtg:0.813,  poc:0,     bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Chitranshi Jain',           title:'Project Analyst',              mtg:0.25,   poc:0,     bench:0.438,onboard:0,    code:0,     events:0.125,visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Mayur Sharma',              title:'Associate Project Manager',    mtg:0.75,   poc:0,     bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Rohit Singh (Sr.)',         title:'Sr. Data Engineer',            mtg:0.438,  poc:0.125, bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Hrushikesh Deodhar',        title:'SDE 1 - PHP',                  mtg:0.438,  poc:0,     bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Aman Sharma',               title:'Project Analyst',              mtg:0.125,  poc:0,     bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0.25,demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Arpita Jain',               title:'Project Manager',              mtg:0.375,  poc:0,     bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Namandeep',                 title:'Project Analyst',              mtg:0,      poc:0,     bench:0,    onboard:0,    code:0,     events:0.313,visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Ankit Yadav',               title:'SDE 1 - PHP',                  mtg:0.25,   poc:0,     bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Fahad',                     title:'SDE 2 - Backend',              mtg:0.25,   poc:0,     bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Amandeep Singh',            title:'Sr. QA Engineer',              mtg:0,      poc:0,     bench:0,    onboard:0,    code:0,     events:0.25, visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Aastha Arora',              title:'Sr. Project Manager',          mtg:0.125,  poc:0,     bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Sunchay Singhal',           title:'Project Analyst - Consultant', mtg:0.125,  poc:0,     bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0},
+  {name:'Bhanu Prakash',             title:'SDE 1 - Full Stack',           mtg:0.063,  poc:0,     bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0,    dev:0}
+];
+
+var CROSS_MAY = [
+  {name:'Abhijit Nair',              title:'Engineering Manager',          mtg:19.0,   poc:0,      bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Aditi Baitule Deshpande',   title:'Sr. Project Manager',          mtg:18.063, poc:0,      bench:0,    onboard:0.875,code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Kandhi Omprakash',          title:'SDE 3 - Full Stack',           mtg:0,      poc:16.125, bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Suraj Singh',               title:'SDE 1 - Full Stack',           mtg:1.375,  poc:11.063, bench:0,    onboard:0,    code:0,     events:0.25, visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Shweta Singh',              title:'Sr. Project Manager',          mtg:3.563,  poc:1.0,    bench:0,    onboard:0,    code:0,     events:0.25, visit:0,  kra:0,    mgmt:0,   demo:0.563,intv:0, cfg:0},
+  {name:'Harshdeep Singh Mokha',     title:'Sr. Project Manager',          mtg:3.125,  poc:0,      bench:0,    onboard:0,    code:0,     events:1.25, visit:0,  kra:0.625,mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Kashish Talwani',           title:'Associate Project Manager',    mtg:2.938,  poc:0,      bench:0,    onboard:0,    code:0,     events:0,    visit:1.0,kra:0,    mgmt:0,   demo:0.125,intv:0, cfg:0},
+  {name:'Ritesh Negi',               title:'Data Analyst',                 mtg:2.5,    poc:1.188,  bench:0,    onboard:0,    code:0,     events:0.25, visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Sachin Vinod Rathod',       title:'QA Engineer',                  mtg:1.813,  poc:0.875,  bench:0,    onboard:0,    code:0,     events:0,    visit:1.125,kra:0,  mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Pragat Singh',              title:'Team Lead - Java',             mtg:3.625,  poc:0,      bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Anup Kumar Srivastav',      title:'Team Lead - Full stack',       mtg:3.263,  poc:0,      bench:0,    onboard:0,    code:0,     events:0.25, visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Vanshika Sehgal',           title:'SDE 1 - Full Stack',           mtg:3.063,  poc:0,      bench:0,    onboard:0,    code:0,     events:0.25, visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Mayur Sharma',              title:'Associate Project Manager',    mtg:1.225,  poc:0,      bench:0,    onboard:0,    code:0,     events:0.25, visit:1.75,kra:0.031,mgmt:0,  demo:0,   intv:0,   cfg:0},
+  {name:'Tabseer Khan',              title:'Data Engineer',                mtg:0.375,  poc:2.125,  bench:0.75, onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Fahimuddin Sayyed',         title:'Project Analyst',              mtg:2.813,  poc:0.375,  bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Krishna Maheshwari',        title:'Associate Project Manager',    mtg:2.563,  poc:0,      bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0.625},
+  {name:'Devang Bhatnagar',          title:'SDE 1 - Frappe',               mtg:2.838,  poc:0,      bench:0,    onboard:0,    code:0,     events:0.313,visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Nadge Sachin Laxi',         title:'SDE 1 - Backend',              mtg:3.0,    poc:0,      bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Samarth Rana',              title:'Project Analyst',              mtg:1.288,  poc:0.375,  bench:0,    onboard:0,    code:0,     events:0,    visit:1.25,kra:0,   mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Abhishek Prajapati',        title:'Flutter Developer - Intern',   mtg:2.0,    poc:0,      bench:0,    onboard:0,    code:0,     events:0.688,visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Pranati Tiwari',            title:'Associate Project Manager',    mtg:2.375,  poc:0,      bench:0,    onboard:0,    code:0.156, events:0.125,visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Samarth Paul',              title:'Associate Project Manager',    mtg:2.281,  poc:0,      bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Shrey Jain',                title:'Team Lead',                    mtg:1.788,  poc:0,      bench:0,    onboard:0,    code:0,     events:0.344,visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Dalbeer Kaur',              title:'Sr. QA Engineer',              mtg:1.938,  poc:0,      bench:0,    onboard:0,    code:0,     events:0.125,visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Navneet Patteri',           title:'SDE 1 - Frappe',               mtg:0.5,    poc:0,      bench:0,    onboard:0,    code:0,     events:1.0,  visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Pooja Srivastava',          title:'Project Analyst - Intern',     mtg:1.156,  poc:0.125,  bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0.125},
+  {name:'Sachin Sharma',             title:'Data Engineer',                mtg:0.563,  poc:0,      bench:0,    onboard:0,    code:0,     events:0.688,visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Bhushan Anilrao Barbuddhe', title:'Team Lead',                    mtg:0.875,  poc:0,      bench:0,    onboard:0,    code:0.125, events:0.188,visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Himanshi Sharma',           title:'Sr. Project Manager',          mtg:0.125,  poc:0,      bench:0,    onboard:0,    code:0,     events:0.5,  visit:0,  kra:0.25, mgmt:0,   demo:0,   intv:0.125,cfg:0},
+  {name:'Rohit Singh (Sr.)',         title:'Sr. Data Engineer',            mtg:0.438,  poc:0,      bench:0,    onboard:0,    code:0,     events:0.25, visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Sureshkumar Mali',          title:'Team Lead - Full stack',       mtg:0.5,    poc:0,      bench:0,    onboard:0,    code:0,     events:0.188,visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Vivek Kumar Singh',         title:'Team Lead - Full stack',       mtg:0.625,  poc:0,      bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Bhanu Marwah',              title:'Data Engineer',                mtg:0.369,  poc:0.188,  bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Harshit Sodhani',           title:'SDE 1 - Full Stack',           mtg:0.406,  poc:0,      bench:0,    onboard:0,    code:0,     events:0.125,visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Sunchay Singhal',           title:'Project Analyst - Consultant', mtg:0.25,   poc:0,      bench:0,    onboard:0,    code:0,     events:0.25, visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Namandeep',                 title:'Project Analyst',              mtg:0.188,  poc:0,      bench:0,    onboard:0,    code:0,     events:0.25, visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Amandeep Singh',            title:'Sr. QA Engineer',              mtg:0.188,  poc:0,      bench:0,    onboard:0,    code:0,     events:0.25, visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Arpita Jain',               title:'Project Manager',              mtg:0.375,  poc:0,      bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Bhanu Prakash',             title:'SDE 1 - Full Stack',           mtg:0.125,  poc:0,      bench:0,    onboard:0,    code:0,     events:0.25, visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Raman Mishra',              title:'SDE 1 - Mobile Developer',     mtg:0.125,  poc:0,      bench:0,    onboard:0,    code:0,     events:0.25, visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Deepak Bharti',             title:'Data Engineer',                mtg:0,      poc:0,      bench:0,    onboard:0,    code:0,     events:0.375,visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Hrushikesh Deodhar',        title:'SDE 1 - PHP',                  mtg:0.25,   poc:0,      bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Brahmjyot Singh',           title:'Product Analyst',              mtg:0,      poc:0,      bench:0,    onboard:0,    code:0,     events:0.188,visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Akshat Verma',              title:'Product Analyst',              mtg:0.125,  poc:0,      bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Chitranshi Jain',           title:'Project Analyst',              mtg:0,      poc:0,      bench:0,    onboard:0,    code:0,     events:0.125,visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Sushant Singh',             title:'QA Engineer',                  mtg:0.075,  poc:0,      bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0},
+  {name:'Ankit Yadav',               title:'SDE 1 - PHP',                  mtg:0.063,  poc:0,      bench:0,    onboard:0,    code:0,     events:0,    visit:0,  kra:0,    mgmt:0,   demo:0,   intv:0,   cfg:0}
+];
+
+var CROSS_COLS = [
+  {key:'mtg',    label:'Meetings'},
+  {key:'poc',    label:'POC'},
+  {key:'bench',  label:'Bench'},
+  {key:'onboard',label:'Onboarding'},
+  {key:'code',   label:'Common Code'},
+  {key:'events', label:'Events'},
+  {key:'visit',  label:'Field Visit'},
+  {key:'kra',    label:'KRA'},
+  {key:'mgmt',   label:'Proj Mgmt'},
+  {key:'demo',   label:'Demo'},
+  {key:'intv',   label:'Interviews'},
+  {key:'cfg',    label:'Config/Docs'}
+];
+
+var crossSortCol='total', crossSortDir='desc';
+
+function buildCrossTab(){
+  var src = curFilter==='apr' ? CROSS_APR : curFilter==='may' ? CROSS_MAY : null;
+  var label = curFilter==='apr'?'April 2026':curFilter==='may'?'May 2026':'Both Months';
+
+  // For 'both', merge APR + MAY
+  var rows;
+  if(!src){
+    var map={};
+    CROSS_APR.forEach(function(e){
+      if(!map[e.name]) map[e.name]={name:e.name,title:e.title};
+      CROSS_COLS.forEach(function(c){map[e.name][c.key]=(map[e.name][c.key]||0)+(e[c.key]||0);});
+    });
+    CROSS_MAY.forEach(function(e){
+      if(!map[e.name]) map[e.name]={name:e.name,title:e.title};
+      CROSS_COLS.forEach(function(c){map[e.name][c.key]=(map[e.name][c.key]||0)+(e[c.key]||0);});
+    });
+    rows=Object.values(map);
+  } else {
+    rows=src.slice();
+  }
+
+  // Compute total per row
+  rows.forEach(function(r){
+    r.total=0;
+    CROSS_COLS.forEach(function(c){r.total+=r[c.key]||0;});
+    r.total=Math.round(r.total*1000)/1000;
+  });
+
+  // Filter zero-total rows
+  rows=rows.filter(function(r){return r.total>0;});
+
+  // Sort
+  rows.sort(function(a,b){
+    var v=0;
+    if(crossSortCol==='name') v=a.name.localeCompare(b.name);
+    else if(crossSortCol==='total') v=a.total-b.total;
+    else v=(a[crossSortCol]||0)-(b[crossSortCol]||0);
+    return crossSortDir==='desc'?-v:v;
+  });
+
+  // Find max per column for heat coloring
+  var colMax={};
+  CROSS_COLS.forEach(function(c){
+    colMax[c.key]=Math.max.apply(null,rows.map(function(r){return r[c.key]||0;}));
+  });
+  colMax.total=Math.max.apply(null,rows.map(function(r){return r.total;}));
+
+  // Build header
+  var headHtml='<th class="no-sort" style="min-width:160px;position:sticky;left:0;background:#1e2130;z-index:2;">Employee</th>';
+  headHtml+='<th class="no-sort" style="min-width:130px;position:sticky;left:160px;background:#1e2130;z-index:2;">Job Title</th>';
+  CROSS_COLS.forEach(function(c){
+    var act=crossSortCol===c.key;
+    headHtml+='<th onclick="crossSort(\''+c.key+'\')" style="text-align:right;min-width:85px;" class="'+(act?'sort-active sort-'+crossSortDir:'')+'">'+c.label+'</th>';
+  });
+  headHtml+='<th onclick="crossSort(\'total\')" style="text-align:right;min-width:70px;background:#212536;" class="'+(crossSortCol==='total'?'sort-active sort-'+crossSortDir:'')+'">Total</th>';
+  document.getElementById('crossHead').innerHTML=headHtml;
+
+  // Build body
+  var bodyHtml='';
+  rows.forEach(function(r,idx){
+    bodyHtml+='<tr>';
+    bodyHtml+='<td style="font-weight:600;position:sticky;left:0;background:var(--card);z-index:1;">'+r.name+'</td>';
+    bodyHtml+='<td style="color:var(--muted);font-size:12px;position:sticky;left:160px;background:var(--card);z-index:1;">'+r.title+'</td>';
+    CROSS_COLS.forEach(function(c){
+      var v=Math.round((r[c.key]||0)*100)/100;
+      var pct=colMax[c.key]>0?r[c.key]/colMax[c.key]:0;
+      var bg=v>0?'rgba(107,138,253,'+Math.round(pct*0.35*100)/100+')':'transparent';
+      var txt=v>0?'<span style="font-size:12px;">'+v.toFixed(2)+'</span>':'<span style="color:var(--border);font-size:12px;">—</span>';
+      bodyHtml+='<td style="text-align:right;background:'+bg+';border-radius:4px;">'+txt+'</td>';
+    });
+    var tpct=colMax.total>0?r.total/colMax.total:0;
+    var tbg='rgba(249,115,22,'+Math.round(tpct*0.4*100)/100+')';
+    bodyHtml+='<td style="text-align:right;font-weight:700;background:'+tbg+';border-radius:4px;">'+r.total.toFixed(2)+'</td>';
+    bodyHtml+='</tr>';
+  });
+
+  // Totals row
+  bodyHtml+='<tr style="background:#1e2130;font-weight:700;">';
+  bodyHtml+='<td style="position:sticky;left:0;background:#1e2130;">TOTAL</td>';
+  bodyHtml+='<td style="position:sticky;left:160px;background:#1e2130;color:var(--muted);font-size:12px;">'+label+'</td>';
+  CROSS_COLS.forEach(function(c){
+    var s=Math.round(rows.reduce(function(acc,r){return acc+(r[c.key]||0);},0)*100)/100;
+    bodyHtml+='<td style="text-align:right;color:var(--orange);">'+(s>0?s.toFixed(2):'—')+'</td>';
+  });
+  var gt=Math.round(rows.reduce(function(acc,r){return acc+r.total;},0)*100)/100;
+  bodyHtml+='<td style="text-align:right;color:var(--orange);">'+gt.toFixed(2)+'</td>';
+  bodyHtml+='</tr>';
+
+  document.getElementById('crossBody').innerHTML=bodyHtml;
+}
+
+function crossSort(col){
+  if(crossSortCol===col){crossSortDir=crossSortDir==='desc'?'asc':'desc';}
+  else{crossSortCol=col;crossSortDir='desc';}
+  buildCrossTab();
 }
 
 buildActChart();
 buildTopChart();
 buildTable();
+buildCrossTab();
 </script>
 </body>
 </html>
