@@ -650,8 +650,8 @@ tr:hover td{background:#1e2130;}
 
   <div class="sec">User Engagement</div>
   <div class="two-col">
-    <div class="chart-card"><h3 id="uTitle">Conversations per User</h3><p id="uSub">Sorted by conversations · Blue = Product · Orange = Services</p><canvas id="userConvChart"></canvas></div>
-    <div class="chart-card"><h3 id="codeChartTitle">Claude Code Lines</h3><p id="codeSub">Lines accepted per developer · Blue = Product · Orange = Services</p><canvas id="codeChart"></canvas></div>
+    <div class="chart-card"><h3 id="uTitle">Conversations per User — Top 10</h3><p id="uSub">Top 10 by conversations · Blue = Product · Orange = Services · Teal = Dhwani ORG</p><canvas id="userConvChart"></canvas></div>
+    <div class="chart-card"><h3 id="codeChartTitle">Claude Code Lines — Top 10</h3><p id="codeSub">Top 10 by code lines · Blue = Product · Orange = Services · Teal = Dhwani ORG</p><canvas id="codeChart"></canvas></div>
   </div>
 
   <div class="sec">Member Activity Breakdown</div>
@@ -954,6 +954,7 @@ function buildUserConv(){
   var members=getMembers(),convs=getConvs();
   var items=members.map(function(m,i){return{name:m.name,convs:convs[i],team:m.team};});
   items.sort(function(a,b){return b.convs-a.convs;});
+  items=items.slice(0,10);
   var labels=items.map(function(x){var p=x.name.split(' ');return p[0]+(p[1]?' '+p[1][0]+'.':'');});
   var colors=items.map(function(x){return(x.team==='product'?BL:x.team==='services'?OR:TE)+'cc';});
   if(userInst){userInst.destroy();}
@@ -967,7 +968,7 @@ function buildUserConv(){
 
 function buildCodeChart(){
   var members=getMembers(),codeArr=getCode();
-  var items=members.map(function(m,i){return{name:m.name,lines:codeArr[i],team:m.team};}).filter(function(x){return x.lines>0;}).sort(function(a,b){return b.lines-a.lines;});
+  var items=members.map(function(m,i){return{name:m.name,lines:codeArr[i],team:m.team};}).filter(function(x){return x.lines>0;}).sort(function(a,b){return b.lines-a.lines;}).slice(0,10);
   var labels=items.map(function(x){var p=x.name.split(' ');return p[0]+(p[1]?' '+p[1][0]+'.':'');});
   var colors=items.map(function(x){return(x.team==='product'?BL:x.team==='services'?OR:TE)+'cc';});
   if(codeInst){codeInst.destroy();}
