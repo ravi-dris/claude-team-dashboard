@@ -927,7 +927,7 @@ function updateCodeHL(){
 function buildDaily(){
   var d;
   if(curTeam==='both') d=getCombinedDaily(curMonth);
-  else{var td=getTeamData(curTeam).daily[curMonth]; d={L:td.L,D:td.D};}
+  else{var T=curTeam==='product'?P:curTeam==='services'?S:O; var td=T.daily[curMonth]; d={L:td.L,D:td.D};}
   var ac=getAccent();
   if(dailyInst){dailyInst.destroy();}
   dailyInst=new Chart(document.getElementById('dailyChart'),{
