@@ -6,7 +6,7 @@
 <title>Dhwani RIS — Claude AI Usage Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-:root{--bg:#0f1117;--card:#1a1d27;--card2:#212536;--border:#2e3248;--blue:#6b8afd;--orange:#f97316;--green:#22c55e;--red:#ef4444;--purple:#a855f7;--text:#e2e8f0;--muted:#8892aa;--font:'Segoe UI',system-ui,sans-serif;}
+:root{--bg:#0f1117;--card:#1a1d27;--card2:#212536;--border:#2e3248;--blue:#6b8afd;--orange:#f97316;--green:#22c55e;--red:#ef4444;--purple:#a855f7;--teal:#06b6d4;--text:#e2e8f0;--muted:#8892aa;--font:'Segoe UI',system-ui,sans-serif;}
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;}
 .header{background:linear-gradient(135deg,#1a1d27,#212536);border-bottom:1px solid var(--border);padding:24px 40px;display:flex;justify-content:space-between;align-items:center;}
@@ -22,6 +22,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 .fbtn:hover{color:var(--text);}
 .fbtn.t-both{background:var(--purple);border-color:var(--purple);color:#fff;font-weight:600;}
 .fbtn.t-product{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:600;}
+.fbtn.t-org{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:600;}
+.tb-o{background:rgba(6,182,212,.12);color:var(--teal);}
 .fbtn.t-services{background:var(--orange);border-color:var(--orange);color:#fff;font-weight:600;}
 .fbtn.m-active{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:600;}
 .filter-note{margin-left:auto;font-size:12px;color:var(--muted);}
@@ -112,20 +114,22 @@ tr:hover td{background:#1e2130;}
   <div class="meta">
     <div><strong>Prepared for:</strong> Ravi Jangir, Strategy &amp; Ops</div>
     <div><strong>Report Date:</strong> June 4, 2026</div>
-    <div><span class="tb tb-p">Product</span> 10 members &nbsp;|&nbsp; <span class="tb tb-s">Services</span> 11 members</div>
-    <div style="margin-top:5px;padding:3px 10px;background:rgba(168,85,247,.12);border-radius:6px;display:inline-block;font-size:12px;" id="hTag" style="color:var(--purple)">63-day · Both Teams</div>
+    <div><span class="tb tb-p">Product</span> 10 &nbsp;|&nbsp; <span class="tb tb-s">Services</span> 11 &nbsp;|&nbsp; <span class="tb tb-o">Dhwani ORG</span> 14 members</div>
+    <div style="margin-top:5px;padding:3px 10px;background:rgba(168,85,247,.12);border-radius:6px;display:inline-block;font-size:12px;" id="hTag">63-day · All Teams</div>
   </div>
 </div>
 
 <div class="filter-wrap">
   <div class="filter-row">
     <span class="filter-label">Team</span>
-    <button class="fbtn t-both"    id="tbtn-both"     onclick="setTeam('both')">Both Teams</button>
+    <button class="fbtn t-both"    id="tbtn-both"     onclick="setTeam('both')">All Teams</button>
     <button class="fbtn"           id="tbtn-product"  onclick="setTeam('product')">Product Team</button>
     <button class="fbtn"           id="tbtn-services" onclick="setTeam('services')">Services Team</button>
-    <div class="filter-note" style="display:flex;gap:18px;">
-      <span><span class="tb tb-p">Product</span> Lead: Ravi Jangir</span>
-      <span><span class="tb tb-s">Services</span> Lead: Ankit Jangir</span>
+    <button class="fbtn"           id="tbtn-org"      onclick="setTeam('org')">Dhwani ORG</button>
+    <div class="filter-note" style="display:flex;gap:14px;">
+      <span><span class="tb tb-p">Product</span> Ravi · 10</span>
+      <span><span class="tb tb-s">Services</span> Ankit · 11</span>
+      <span><span class="tb tb-o">Dhwani ORG</span> Swapnil · 14</span>
     </div>
   </div>
   <div class="filter-row">
@@ -143,7 +147,7 @@ tr:hover td{background:#1e2130;}
   <div class="sec">Overall Performance</div>
   <div class="explain"><b>Total Conversations</b> = chat sessions started. <b>Messages Sent</b> = prompts by team members. <b>Active Members</b> = had at least 1 conversation. <b>Inactive</b> = 0 conversations AND last activity (chat + Claude Code) more than 14 days ago.</div>
   <div class="kpi-grid">
-    <div class="kpi"><div class="lbl">Total Conversations</div><div class="val" id="kConvs">1,820</div><div class="sub neu" id="kConvsSub">Both Teams · All Time</div></div>
+    <div class="kpi"><div class="lbl">Total Conversations</div><div class="val" id="kConvs">2,122</div><div class="sub neu" id="kConvsSub">All Teams · All Time</div></div>
     <div class="kpi"><div class="lbl">Messages Sent</div><div class="val" id="kMsgs">15,278</div><div class="sub neu" id="kMsgsSub">Human prompts · All Time</div></div>
     <div class="kpi"><div class="lbl">AI Responses</div><div class="val" id="kResp">15,387</div><div class="sub up">↑ 99.3% response rate</div></div>
     <div class="kpi"><div class="lbl">Active Members</div><div class="val" id="kUsers">21</div><div class="sub up" id="kUsersSub">21 of 21 active</div></div>
@@ -540,7 +544,7 @@ tr:hover td{background:#1e2130;}
 
 <div class="footer">
   Dhwani Rural Information Systems &nbsp;|&nbsp; Claude AI Dashboard — Product &amp; Services &nbsp;|&nbsp; June 4, 2026<br>
-  <span style="color:#ef444466;font-size:11px;">⚠ Not in members list (excluded): Product — om.prakash (Apr: 14,681 lines), fathima.nihala (Apr: 601 lines) &nbsp;|&nbsp; Services — shlok (Apr: 39,541 lines), vivek.kumar (Apr: 1,453 | May: 2,315 lines)</span>
+  <span style="color:#ef444466;font-size:11px;">⚠ Not in members list (excluded): Product — om.prakash (Apr: 14,681), fathima.nihala (Apr: 601) &nbsp;|&nbsp; Services — shlok (Apr: 39,541), vivek.kumar (Apr: 1,453 | May: 2,315) &nbsp;|&nbsp; Dhwani ORG — navneet.patteri (Apr: 61,580 | May: 11,734), samarth.paul (Apr: 29,739 | May: 5,450), suresh.mali (Apr: 25,090 | May: 68,601), harshdeep (Apr: 9,501), pooja.srivastava (Apr: 5,210)</span>
 </div>
 
 <script>
@@ -600,19 +604,80 @@ var S={
   }
 };
 
+// ── DHWANI ORG (Swapnil's Account) ───────────────────────────────────────────
+// Note: navneet.patteri, samarth.paul, suresh.mali, harshdeep, pooja.srivastava
+// appear in code CSVs but are not in the members list — excluded from totals.
+// Member name "can you create a scraper..." corrected to Deepak Batra (by email).
+var O={
+  members:[
+    {name:'Swapnil Agarwal',  email:'swapnil@dhwaniris.com',          ini:'SA',role:'Primary Owner',tier:'Premium', team:'org'},
+    {name:'Krishna Maheshwari',email:'krishna.maheshwari@dhwaniris.com',ini:'KM',role:'Owner',        tier:'Premium', team:'org'},
+    {name:'Ankit Yadav',      email:'ankit.yadav@dhwaniris.com',       ini:'AY',role:'User',          tier:'Standard',team:'org'},
+    {name:'Bhushan Barbuddhe',email:'bhushan.barbuddhe@dhwaniris.com', ini:'BB',role:'User',          tier:'Standard',team:'org'},
+    {name:'Vivek Singh',      email:'vivek.kumar@dhwaniris.com',        ini:'VS',role:'User',          tier:'Standard',team:'org'},
+    {name:'Ankit',            email:'ankit@dhwaniris.com',              ini:'AK',role:'User',          tier:'Standard',team:'org'},
+    {name:'Aditya Gore',      email:'aditya.gore@dhwaniris.com',        ini:'AG',role:'User',          tier:'Standard',team:'org'},
+    {name:'Pragat Singh',     email:'pragat.singh@dhwaniris.com',       ini:'PS',role:'User',          tier:'Standard',team:'org'},
+    {name:'Deepak Batra',     email:'deepak.batra@dhwaniris.com',       ini:'DB',role:'User',          tier:'Standard',team:'org'},
+    {name:'Shrey Jain',       email:'shrey.jain@dhwaniris.com',         ini:'SJ',role:'User',          tier:'Standard',team:'org'},
+    {name:'Aditi Baitule',    email:'aditi.baitule@dhwaniris.com',      ini:'AB',role:'User',          tier:'Standard',team:'org'},
+    {name:'Vishwa Patel',     email:'vishwa.patel@dhwaniris.com',        ini:'VP',role:'User',          tier:'Standard',team:'org'},
+    {name:'Vepasa',           email:'vepasa@dhwaniris.com',              ini:'VE',role:'User',          tier:'Standard',team:'org'},
+    {name:'Kajol Mehta',      email:'kajol.mehta@dhwaniris.com',         ini:'KJ',role:'User',          tier:'Standard',team:'org'}
+  ],
+  convs:{
+    'all':     [50,117, 4,24, 8, 1, 1,23,30,11,10, 1,19, 3],
+    '2026-04': [17, 80, 1,15, 5, 1, 1,10, 8, 6, 0, 0, 0, 0],
+    '2026-05': [26, 33, 3, 4, 0, 0, 0,11,16, 3, 6, 1,11, 0],
+    '2026-06': [ 7,  4, 0, 5, 3, 0, 0, 2, 6, 2, 4, 0, 8, 3]
+  },
+  msgs:{
+    'all':     [368,846, 3,66,77, 1, 3,227,161,22,57, 2,163,16],
+    '2026-04': [134,652, 0,51,72, 1, 3, 63, 39,14, 0, 0,  0, 0],
+    '2026-05': [197,177, 3, 5, 0, 0, 0, 30, 74, 5,47, 2, 84, 0],
+    '2026-06': [ 37, 17, 0,10, 5, 0, 0,134, 48, 3,10, 0, 79,16]
+  },
+  code:{
+    'all':     [0,231962,49715,21278,43723,77248,60190,48299,14015,44020,3666,0,0,0],
+    '2026-04': [0,  5234,29215, 2447, 9080,23961,21723,32388, 2619, 3548,   0,0,0,0],
+    '2026-05': [0,196577,19284,16783,34455,48859,32368,15338,11396,35569, 2184,0,0,0],
+    '2026-06': [0, 30151, 1216, 2048,  188, 4428, 6099,  573,    0, 4903, 1482,0,0,0]
+  },
+  last:['2026-06-05','2026-06-04','2026-06-04','2026-06-05','2026-06-04','2026-06-04','2026-06-04','2026-06-03','2026-06-05','2026-06-04','2026-06-04','2026-05-05','2026-06-05','2026-06-04'],
+  monthly:{'2026-04':{c:144,m:1029,u:10},'2026-05':{c:114,m:624,u:10},'2026-06':{c:44,m:359,u:10}},
+  daily:{
+    '2026-04':{L:['Apr 01','Apr 02','Apr 03','Apr 04','Apr 05','Apr 06','Apr 07','Apr 08','Apr 09','Apr 10','Apr 11','Apr 12','Apr 13','Apr 14','Apr 15','Apr 16','Apr 17','Apr 18','Apr 19','Apr 20','Apr 21','Apr 22','Apr 23','Apr 24','Apr 25','Apr 26','Apr 27','Apr 28','Apr 29','Apr 30'],D:[7,9,15,2,1,13,6,10,3,17,4,2,8,8,11,10,11,2,3,4,9,15,7,7,2,4,12,11,2,5]},
+    '2026-05':{L:['May 01','May 02','May 03','May 04','May 05','May 06','May 08','May 10','May 11','May 12','May 13','May 14','May 15','May 16','May 18','May 19','May 20','May 21','May 22','May 23','May 24','May 25','May 26','May 27','May 28','May 29','May 30'],D:[4,3,4,14,4,4,4,1,2,6,9,10,4,4,6,6,5,7,7,2,1,3,6,4,7,5,2]},
+    '2026-06':{L:['Jun 01','Jun 02','Jun 03','Jun 04','Jun 05'],D:[8,10,10,8,8]},
+    'all':{L:['Apr 03','Apr 06','Apr 08','Apr 10','Apr 13','Apr 16','Apr 22','Apr 27','May 01','May 04','May 06','May 12','May 14','May 19','May 21','May 26','May 28','Jun 01','Jun 02','Jun 03','Jun 04','Jun 05'],D:[15,13,10,17,8,10,15,12,4,14,4,6,10,6,7,6,7,8,10,10,8,8]}
+  }
+};
+
 var CODE_HL={
-  both:{all:{lines:'2,058,226',rate:'99.8% (Product·May)',top:'465,391',topWho:'ankit.jangir (Services)',users:'17 / 21'},
-       '2026-04':{lines:'715,446',rate:'N/A',top:'226,319',topWho:'ankit.jangir (Services)',users:'14 / 21'},
-       '2026-05':{lines:'1,245,156',rate:'99.8% (Product)',top:'239,916',topWho:'ravi.jangir (Product)',users:'15 / 21'},
-       '2026-06':{lines:'97,624',rate:'N/A',top:'60,324',topWho:'ankit.jangir (Services)',users:'9 / 21'}},
-  product:{all:{lines:'896,054',rate:'99.8% (May)',top:'323,552',topWho:'ravi.jangir',users:'8 / 10'},
-           '2026-04':{lines:'246,205',rate:'N/A',top:'83,636',topWho:'ravi.jangir',users:'7 / 10'},
-           '2026-05':{lines:'628,749',rate:'99.8%',top:'239,916',topWho:'ravi.jangir',users:'7 / 10'},
-           '2026-06':{lines:'21,100',rate:'N/A',top:'19,013',topWho:'arpita.jain',users:'3 / 10'}},
-  services:{all:{lines:'1,162,172',rate:'N/A',top:'465,391',topWho:'ankit.jangir',users:'9 / 11'},
-            '2026-04':{lines:'469,241',rate:'N/A',top:'226,319',topWho:'ankit.jangir',users:'7 / 11'},
-            '2026-05':{lines:'616,407',rate:'N/A',top:'178,748',topWho:'ankit.jangir',users:'8 / 11'},
-            '2026-06':{lines:'76,524',rate:'N/A',top:'60,324',topWho:'ankit.jangir',users:'6 / 11'}}
+  both:{
+    all:     {lines:'2,652,342',rate:'99.8% (Product·May)',top:'465,391',topWho:'ankit.jangir (Services)',users:'27 / 35'},
+    '2026-04':{lines:'845,661',rate:'N/A',top:'226,319',topWho:'ankit.jangir (Services)',users:'21 / 35'},
+    '2026-05':{lines:'1,657,969',rate:'99.8% (Product)',top:'239,916',topWho:'ravi.jangir (Product)',users:'25 / 35'},
+    '2026-06':{lines:'148,712',rate:'N/A',top:'60,324',topWho:'ankit.jangir (Services)',users:'18 / 35'}
+  },
+  product:{
+    all:     {lines:'896,054',rate:'99.8% (May)',top:'323,552',topWho:'ravi.jangir',users:'8 / 10'},
+    '2026-04':{lines:'246,205',rate:'N/A',top:'83,636',topWho:'ravi.jangir',users:'7 / 10'},
+    '2026-05':{lines:'628,749',rate:'99.8%',top:'239,916',topWho:'ravi.jangir',users:'7 / 10'},
+    '2026-06':{lines:'21,100',rate:'N/A',top:'19,013',topWho:'arpita.jain',users:'3 / 10'}
+  },
+  services:{
+    all:     {lines:'1,162,172',rate:'N/A',top:'465,391',topWho:'ankit.jangir',users:'9 / 11'},
+    '2026-04':{lines:'469,241',rate:'N/A',top:'226,319',topWho:'ankit.jangir',users:'7 / 11'},
+    '2026-05':{lines:'616,407',rate:'N/A',top:'178,748',topWho:'ankit.jangir',users:'8 / 11'},
+    '2026-06':{lines:'76,524',rate:'N/A',top:'60,324',topWho:'ankit.jangir',users:'6 / 11'}
+  },
+  org:{
+    all:     {lines:'594,116',rate:'N/A',top:'231,962',topWho:'krishna.maheshwari',users:'10 / 14'},
+    '2026-04':{lines:'130,215',rate:'N/A',top:'32,388',topWho:'pragat.singh',users:'9 / 14'},
+    '2026-05':{lines:'412,813',rate:'N/A',top:'196,577',topWho:'krishna.maheshwari',users:'10 / 14'},
+    '2026-06':{lines:'51,088',rate:'N/A',top:'30,151',topWho:'krishna.maheshwari',users:'9 / 14'}
+  }
 };
 
 var META={all:{label:'All Time',sub:'Apr 2 – Jun 4, 2026'},'2026-04':{label:'April 2026',sub:'April 2026'},'2026-05':{label:'May 2026',sub:'May 2026'},'2026-06':{label:'June 2026',sub:'June 1–4, 2026'}};
@@ -625,19 +690,48 @@ var curTeam='both', curMonth='all';
 var sortCol='convs', sortDir='desc';
 var dailyInst=null,monthlyInst=null,userInst=null,codeInst=null,utilInst=null;
 
-function getTeamData(t){return t==='product'?P:S;}
-function getMembers(){return curTeam==='both'?P.members.concat(S.members):(curTeam==='product'?P.members:S.members);}
-function getConvs(){return curTeam==='both'?P.convs[curMonth].concat(S.convs[curMonth]):(curTeam==='product'?P.convs[curMonth]:S.convs[curMonth]);}
-function getMsgs(){return curTeam==='both'?P.msgs[curMonth].concat(S.msgs[curMonth]):(curTeam==='product'?P.msgs[curMonth]:S.msgs[curMonth]);}
-function getCode(){return curTeam==='both'?P.code[curMonth].concat(S.code[curMonth]):(curTeam==='product'?P.code[curMonth]:S.code[curMonth]);}
-function getLast(){return curTeam==='both'?P.last.concat(S.last):(curTeam==='product'?P.last:S.last);}
-function getTotalMbr(){return curTeam==='both'?21:(curTeam==='product'?10:11);}
-function getAccent(){return curTeam==='product'?BL:curTeam==='services'?OR:PU;}
+var TE='#06b6d4'; // teal for Dhwani ORG
+function teamLabel(){return curTeam==='both'?'All Teams':curTeam==='product'?'Product Team':curTeam==='services'?'Services Team':'Dhwani ORG';}
+function teamLabelShort(){return curTeam==='both'?'All Teams':curTeam==='product'?'Product':curTeam==='services'?'Services':'Dhwani ORG';}
+function getMembers(){
+  if(curTeam==='both') return P.members.concat(S.members).concat(O.members);
+  if(curTeam==='product') return P.members;
+  if(curTeam==='services') return S.members;
+  return O.members;
+}
+function getConvs(){
+  if(curTeam==='both') return P.convs[curMonth].concat(S.convs[curMonth]).concat(O.convs[curMonth]);
+  if(curTeam==='product') return P.convs[curMonth];
+  if(curTeam==='services') return S.convs[curMonth];
+  return O.convs[curMonth];
+}
+function getMsgs(){
+  if(curTeam==='both') return P.msgs[curMonth].concat(S.msgs[curMonth]).concat(O.msgs[curMonth]);
+  if(curTeam==='product') return P.msgs[curMonth];
+  if(curTeam==='services') return S.msgs[curMonth];
+  return O.msgs[curMonth];
+}
+function getCode(){
+  if(curTeam==='both') return P.code[curMonth].concat(S.code[curMonth]).concat(O.code[curMonth]);
+  if(curTeam==='product') return P.code[curMonth];
+  if(curTeam==='services') return S.code[curMonth];
+  return O.code[curMonth];
+}
+function getLast(){
+  if(curTeam==='both') return P.last.concat(S.last).concat(O.last);
+  if(curTeam==='product') return P.last;
+  if(curTeam==='services') return S.last;
+  return O.last;
+}
+function getTotalMbr(){return curTeam==='both'?35:curTeam==='product'?10:curTeam==='services'?11:14;}
+function getAccent(){return curTeam==='product'?BL:curTeam==='services'?OR:curTeam==='org'?TE:PU;}
 
 function getCombinedDaily(month){
-  var p=P.daily[month],s=S.daily[month],map={};
-  for(var i=0;i<p.L.length;i++) map[p.L[i]]=(map[p.L[i]]||0)+p.D[i];
-  for(var i=0;i<s.L.length;i++) map[s.L[i]]=(map[s.L[i]]||0)+s.D[i];
+  var map={};
+  [P,S,O].forEach(function(T){
+    var d=T.daily[month];
+    for(var i=0;i<d.L.length;i++) map[d.L[i]]=(map[d.L[i]]||0)+d.D[i];
+  });
   var labels=Object.keys(map).sort(function(a,b){return a>b?1:-1;});
   return{L:labels,D:labels.map(function(l){return map[l];})};
 }
@@ -645,16 +739,18 @@ function getCombinedDaily(month){
 function updateKPIs(){
   var totalC,totalM,activeU,tot=getTotalMbr();
   if(curMonth==='all'){
-    if(curTeam==='both'){totalC=1820;totalM=15278;activeU=21;}
+    if(curTeam==='both'){totalC=2122;totalM=17290;activeU=35;}
     else if(curTeam==='product'){totalC=1189;totalM=8968;activeU=10;}
-    else{totalC=631;totalM=6310;activeU=11;}
+    else if(curTeam==='services'){totalC=631;totalM=6310;activeU=11;}
+    else{totalC=302;totalM=2012;activeU=14;}
   } else {
-    var pm=P.monthly[curMonth],sm=S.monthly[curMonth];
-    if(curTeam==='both'){totalC=pm.c+sm.c;totalM=pm.m+sm.m;activeU=pm.u+sm.u;}
+    var pm=P.monthly[curMonth],sm=S.monthly[curMonth],om=O.monthly[curMonth];
+    if(curTeam==='both'){totalC=pm.c+sm.c+om.c;totalM=pm.m+sm.m+om.m;activeU=pm.u+sm.u+om.u;}
     else if(curTeam==='product'){totalC=pm.c;totalM=pm.m;activeU=pm.u;}
-    else{totalC=sm.c;totalM=sm.m;activeU=sm.u;}
+    else if(curTeam==='services'){totalC=sm.c;totalM=sm.m;activeU=sm.u;}
+    else{totalC=om.c;totalM=om.m;activeU=om.u;}
   }
-  var tLabel=curTeam==='both'?'Both Teams':curTeam==='product'?'Product Team':'Services Team';
+  var tLabel=teamLabel();
   document.getElementById('kConvs').textContent=fmtNum(totalC);
   document.getElementById('kConvsSub').textContent=tLabel+' · '+META[curMonth].label;
   document.getElementById('kMsgs').textContent=fmtNum(totalM);
@@ -670,7 +766,7 @@ function updateKPIs(){
 
 function updateCodeHL(){
   var h=CODE_HL[curTeam][curMonth];
-  var tLabel=curTeam==='both'?'Both Teams':curTeam==='product'?'Product':'Services';
+  var tLabel=teamLabelShort();
   document.getElementById('hlLines').textContent=h.lines;
   document.getElementById('hlLinesSub').textContent=tLabel+' · '+META[curMonth].label;
   document.getElementById('hlRate').textContent=h.rate;
@@ -692,14 +788,15 @@ function buildDaily(){
     type:'line',data:{labels:d.L,datasets:[{label:'Conversations',data:d.D,borderColor:ac,backgroundColor:ac+'22',fill:true,tension:.4,pointRadius:3,pointBackgroundColor:ac,borderWidth:2}]},
     options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:GRID},ticks:{maxTicksLimit:12,font:{size:11}}},y:{grid:{color:GRID},beginAtZero:true}}}
   });
-  var tLabel=curTeam==='both'?'Both Teams':curTeam==='product'?'Product':'Services';
+  var tLabel=teamLabelShort();
   document.getElementById('dTitle').textContent='Daily Conversations — '+META[curMonth].label+' · '+tLabel;
 }
 
 function buildMonthly(){
   var datasets=[];
-  if(curTeam==='both'||curTeam==='product') datasets.push({label:'Product',data:[P.monthly['2026-04'].c,P.monthly['2026-05'].c,P.monthly['2026-06'].c],backgroundColor:BL+'cc',borderRadius:6,borderSkipped:false});
-  if(curTeam==='both'||curTeam==='services') datasets.push({label:'Services',data:[S.monthly['2026-04'].c,S.monthly['2026-05'].c,S.monthly['2026-06'].c],backgroundColor:OR+'cc',borderRadius:6,borderSkipped:false});
+  if(curTeam==='both'||curTeam==='product')  datasets.push({label:'Product',    data:[P.monthly['2026-04'].c,P.monthly['2026-05'].c,P.monthly['2026-06'].c],backgroundColor:BL+'cc',borderRadius:6,borderSkipped:false});
+  if(curTeam==='both'||curTeam==='services') datasets.push({label:'Services',   data:[S.monthly['2026-04'].c,S.monthly['2026-05'].c,S.monthly['2026-06'].c],backgroundColor:OR+'cc',borderRadius:6,borderSkipped:false});
+  if(curTeam==='both'||curTeam==='org')      datasets.push({label:'Dhwani ORG', data:[O.monthly['2026-04'].c,O.monthly['2026-05'].c,O.monthly['2026-06'].c],backgroundColor:TE+'cc',borderRadius:6,borderSkipped:false});
   if(monthlyInst){monthlyInst.destroy();}
   monthlyInst=new Chart(document.getElementById('monthlyChart'),{
     type:'bar',data:{labels:['April 2026','May 2026','June 2026\n(1-4)'],datasets:datasets},
@@ -712,13 +809,13 @@ function buildUserConv(){
   var items=members.map(function(m,i){return{name:m.name,convs:convs[i],team:m.team};});
   items.sort(function(a,b){return b.convs-a.convs;});
   var labels=items.map(function(x){var p=x.name.split(' ');return p[0]+(p[1]?' '+p[1][0]+'.':'');});
-  var colors=items.map(function(x){return(x.team==='product'?BL:OR)+'cc';});
+  var colors=items.map(function(x){return(x.team==='product'?BL:x.team==='services'?OR:TE)+'cc';});
   if(userInst){userInst.destroy();}
   userInst=new Chart(document.getElementById('userConvChart'),{
     type:'bar',data:{labels:labels,datasets:[{label:'Conversations',data:items.map(function(x){return x.convs;}),backgroundColor:colors,borderRadius:6,borderSkipped:false}]},
     options:{responsive:true,maintainAspectRatio:true,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:{color:GRID},beginAtZero:true},y:{grid:{display:false},ticks:{font:{size:10}}}}}
   });
-  var tLabel=curTeam==='both'?'Both Teams':curTeam==='product'?'Product':'Services';
+  var tLabel=teamLabelShort();
   document.getElementById('uTitle').textContent='Conversations per User — '+META[curMonth].label+' · '+tLabel;
 }
 
@@ -726,13 +823,13 @@ function buildCodeChart(){
   var members=getMembers(),codeArr=getCode();
   var items=members.map(function(m,i){return{name:m.name,lines:codeArr[i],team:m.team};}).filter(function(x){return x.lines>0;}).sort(function(a,b){return b.lines-a.lines;});
   var labels=items.map(function(x){var p=x.name.split(' ');return p[0]+(p[1]?' '+p[1][0]+'.':'');});
-  var colors=items.map(function(x){return(x.team==='product'?BL:OR)+'cc';});
+  var colors=items.map(function(x){return(x.team==='product'?BL:x.team==='services'?OR:TE)+'cc';});
   if(codeInst){codeInst.destroy();}
   codeInst=new Chart(document.getElementById('codeChart'),{
     type:'bar',data:{labels:labels,datasets:[{label:'Lines',data:items.map(function(x){return x.lines;}),backgroundColor:colors,borderRadius:6,borderSkipped:false}]},
     options:{responsive:true,maintainAspectRatio:true,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return' '+fmtNum(ctx.parsed.x)+' lines';}}}},scales:{x:{grid:{color:GRID},beginAtZero:true,ticks:{callback:function(v){return(v/1000).toFixed(0)+'k';}}},y:{grid:{display:false},ticks:{font:{size:10}}}}}
   });
-  var tLabel=curTeam==='both'?'Both Teams':curTeam==='product'?'Product':'Services';
+  var tLabel=teamLabelShort();
   document.getElementById('codeChartTitle').textContent='Claude Code Lines — '+META[curMonth].label+' · '+tLabel;
 }
 
@@ -757,7 +854,7 @@ function buildUtil(){
 function buildTable(){
   var members=getMembers(),convs=getConvs(),msgs=getMsgs(),code=getCode();
   var maxC=Math.max.apply(null,convs)||1;
-  var showTeam=curTeam==='both';
+  var showTeam=(curTeam==='both');
   document.getElementById('thTeam').style.display=showTeam?'':'none';
   var last=getLast();
   var rows=members.map(function(m,i){
@@ -783,12 +880,12 @@ function buildTable(){
     var pct=Math.round(r.convs/maxC*100);
     var roleLabel=(r.m.role==='Primary Owner'||r.m.role==='Owner')?r.m.role:r.m.tier;
     var roleCls=(r.m.role==='Primary Owner'||r.m.role==='Owner')?'bo':(r.m.tier==='Standard'?'bs':'bp');
-    var avBg=r.m.team==='product'?BL:OR;
+    var avBg=r.m.team==='product'?BL:r.m.team==='services'?OR:TE;
     var barColor=avBg;
     html+='<tr>';
     html+='<td><span class="rk '+rkC[idx]+'">'+(idx+1)+'</span></td>';
     html+='<td><div class="uc"><div class="av" style="background:'+avBg+'">'+r.m.ini+'</div><div><div>'+r.m.name+'</div><div class="ue">'+r.m.email+'</div></div></div></td>';
-    if(showTeam) html+='<td><span class="tb '+(r.m.team==='product'?'tb-p':'tb-s')+'">'+(r.m.team==='product'?'Product':'Services')+'</span></td>';
+    if(showTeam){var tc=r.m.team==='product'?'tb-p':r.m.team==='services'?'tb-s':'tb-o';var tl=r.m.team==='product'?'Product':r.m.team==='services'?'Services':'Dhwani ORG';html+='<td><span class="tb '+tc+'">'+tl+'</span></td>';}
     html+='<td><span class="badge '+roleCls+'">'+roleLabel+'</span></td>';
     html+='<td><div class="pb-wrap"><div class="pb"><div class="fill" style="width:'+pct+'%;background:'+barColor+'"></div></div><span class="num">'+r.convs+'</span></div></td>';
     html+='<td>'+fmtNum(r.msgs)+'</td><td>'+avg+'</td>';
@@ -797,15 +894,15 @@ function buildTable(){
     html+='</tr>';
   }
   document.getElementById('tBody').innerHTML=html;
-  var tLabel=curTeam==='both'?'Both Teams':curTeam==='product'?'Product Team':'Services Team';
+  var tLabel=teamLabel();
   document.getElementById('tCaption').textContent='Sorted by conversations · '+META[curMonth].label+' · '+tLabel;
 }
 
 function buildInactive(){
   var members=getMembers(),last=getLast();
   var convKey=curMonth==='all'?'2026-06':curMonth;
-  var checkConvs=curTeam==='both'?P.convs[convKey].concat(S.convs[convKey]):(curTeam==='product'?P.convs[convKey]:S.convs[convKey]);
-  var checkCode =curTeam==='both'?P.code[convKey].concat(S.code[convKey]):(curTeam==='product'?P.code[convKey]:S.code[convKey]);
+  var checkConvs=curTeam==='both'?P.convs[convKey].concat(S.convs[convKey]).concat(O.convs[convKey]):(curTeam==='product'?P.convs[convKey]:curTeam==='services'?S.convs[convKey]:O.convs[convKey]);
+  var checkCode =curTeam==='both'?P.code[convKey].concat(S.code[convKey]).concat(O.code[convKey]):(curTeam==='product'?P.code[convKey]:curTeam==='services'?S.code[convKey]:O.code[convKey]);
   var inactive=[],tot=getTotalMbr();
   for(var i=0;i<members.length;i++){
     if(!isActiveMember(checkConvs[i],checkCode[i],last[i])) inactive.push({m:members[i],last:last[i]});
@@ -829,7 +926,7 @@ function buildInactive(){
     html+='<div class="iitem"><div class="av" style="background:'+avBg+'">'+inactive[j].m.ini+'</div>';
     html+='<div>';
     html+='<div style="font-weight:600">'+inactive[j].m.name+'</div>';
-    if(curTeam==='both') html+='<span class="tb '+(inactive[j].m.team==='product'?'tb-p':'tb-s')+'" style="margin-left:0;margin-bottom:2px;display:inline-block">'+(inactive[j].m.team==='product'?'Product':'Services')+'</span>';
+    if(curTeam==='both'){var ic2=inactive[j].m.team==='product'?'tb-p':inactive[j].m.team==='services'?'tb-s':'tb-o';var il2=inactive[j].m.team==='product'?'Product':inactive[j].m.team==='services'?'Services':'Dhwani ORG';html+='<span class="tb '+ic2+'" style="margin-left:0;margin-bottom:2px;display:inline-block">'+il2+'</span>';}
     html+='<div class="ue">'+inactive[j].m.email+'</div>';
     html+='<div class="last-seen">Last active: '+fmtDate(inactive[j].last)+'</div></div>';
     html+='<div class="idays"><div class="dnum '+dnCls+'">'+days+'</div><div class="dlbl">days ago</div></div></div>';
@@ -845,7 +942,7 @@ function updateSortHeaders(){
     el.className='sortable'+(c===sortCol?' sort-active sort-'+sortDir:'');
   });
   var colLabels={convs:'conversations',msgs:'messages sent',avg:'avg depth',code:'code lines',status:'status',name:'name'};
-  var tLabel=curTeam==='both'?'Both Teams':curTeam==='product'?'Product Team':'Services Team';
+  var tLabel=teamLabel();
   document.getElementById('tCaption').textContent=
     'Sorted by '+colLabels[sortCol]+' ('+(sortDir==='desc'?'↓ high to low':'↑ low to high')+') · '+META[curMonth].label+' · '+tLabel;
 }
@@ -868,6 +965,7 @@ function setTeam(t){
   document.getElementById('tbtn-both').className='fbtn'+(t==='both'?' t-both':'');
   document.getElementById('tbtn-product').className='fbtn'+(t==='product'?' t-product':'');
   document.getElementById('tbtn-services').className='fbtn'+(t==='services'?' t-services':'');
+  document.getElementById('tbtn-org').className='fbtn'+(t==='org'?' t-org':'');
   refresh();
 }
 
