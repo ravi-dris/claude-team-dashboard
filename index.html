@@ -985,12 +985,23 @@ function isActiveMember(c, cd, lastDate){
   return c > 0 || cd > 0 || daysSince(lastDate) <= 14;
 }
 
-function buildUtil(){
-  var members=getMembers(),convs=getConvs(),codeArr=getCode(),last=getLast(),tot=getTotalMbr();
-  var active=0,inactive=0;
+// Single source of truth for inactive list — used by both doughnut and panel
+function getInactiveList(){
+  var members=getMembers(), last=getLast();
+  var convKey=curMonth==='all'?'2026-06':curMonth;
+  var chkC=curTeam==='both'?P.convs[convKey].concat(S.convs[convKey]).concat(O.convs[convKey]):(curTeam==='product'?P.convs[convKey]:curTeam==='services'?S.convs[convKey]:O.convs[convKey]);
+  var chkK=curTeam==='both'?P.code[convKey].concat(S.code[convKey]).concat(O.code[convKey]):(curTeam==='product'?P.code[convKey]:curTeam==='services'?S.code[convKey]:O.code[convKey]);
+  var inactive=[];
   for(var i=0;i<members.length;i++){
-    if(isActiveMember(convs[i],codeArr[i],last[i])){active++;}else{inactive++;}
+    if(!isActiveMember(chkC[i],chkK[i],last[i])) inactive.push({m:members[i],last:last[i]});
   }
+  return inactive;
+}
+
+function buildUtil(){
+  var inactive=getInactiveList().length;
+  var tot=getTotalMbr();
+  var active=tot-inactive;
   if(utilInst){utilInst.destroy();}
   utilInst=new Chart(document.getElementById('utilChart'),{
     type:'doughnut',data:{labels:['Active','Inactive'],datasets:[{data:[active,inactive],backgroundColor:[GR+'cc',RE+'cc'],borderColor:'#1a1d27',borderWidth:3,hoverOffset:4}]},
@@ -1046,14 +1057,8 @@ function buildTable(){
 }
 
 function buildInactive(){
-  var members=getMembers(),last=getLast();
-  var convKey=curMonth==='all'?'2026-06':curMonth;
-  var checkConvs=curTeam==='both'?P.convs[convKey].concat(S.convs[convKey]).concat(O.convs[convKey]):(curTeam==='product'?P.convs[convKey]:curTeam==='services'?S.convs[convKey]:O.convs[convKey]);
-  var checkCode =curTeam==='both'?P.code[convKey].concat(S.code[convKey]).concat(O.code[convKey]):(curTeam==='product'?P.code[convKey]:curTeam==='services'?S.code[convKey]:O.code[convKey]);
-  var inactive=[],tot=getTotalMbr();
-  for(var i=0;i<members.length;i++){
-    if(!isActiveMember(checkConvs[i],checkCode[i],last[i])) inactive.push({m:members[i],last:last[i]});
-  }
+  var inactive=getInactiveList(); // single source of truth — same as doughnut
+  var tot=getTotalMbr();
   inactive.sort(function(a,b){return daysSince(b.last)-daysSince(a.last);});
   var count=inactive.length;
   var periodLabel=curMonth==='all'?'last 14 days':META[curMonth].label;
