@@ -686,15 +686,56 @@ tr:hover td{background:#1e2130;}
     </div>
   </div>
 
+  <!-- BILLING SECTION -->
+  <div class="sec">Billing & Cost Analysis</div>
+  <div class="explain"><b>Spend data</b> from claude.ai invoice pages for all 3 accounts. Dhwani ORG billing only covers April (no May/June invoices). <b>Cost per conversation</b> and <b>cost per code line</b> are calculated against the Apr–Jun usage window. Updates with the Team filter.</div>
+
+  <div class="kpi-grid" style="margin-bottom:18px;">
+    <div class="kpi" style="border-color:rgba(250,204,21,.3)"><div class="lbl">Total Spend (Apr–Jun)</div><div class="val" id="bTotal" style="color:#facc15">$8,628</div><div class="sub neu" id="bTotalSub">All teams · Apr–Jun 2026</div></div>
+    <div class="kpi"><div class="lbl">Cost per Conversation</div><div class="val" id="bPerConv">$4.07</div><div class="sub neu" id="bPerConvSub">All teams avg</div></div>
+    <div class="kpi"><div class="lbl">Cost per Code Line</div><div class="val" id="bPerLine">$0.0033</div><div class="sub neu" id="bPerLineSub">All teams · Apr–Jun</div></div>
+    <div class="kpi"><div class="lbl">Monthly Trend</div><div class="val" id="bTrend" style="color:var(--red)">↑</div><div class="sub" id="bTrendSub" style="color:var(--muted)">Apr $4,192 → May $2,111 → Jun $2,325</div></div>
+    <div class="kpi"><div class="lbl">Invoices</div><div class="val" id="bInvoices">35</div><div class="sub neu" id="bInvoicesSub">Apr–Jun · all accounts</div></div>
+  </div>
+
+  <div class="two-col">
+    <div class="chart-card">
+      <h3 id="bBarTitle">Monthly Spend by Team</h3>
+      <p>Billed amount per month for selected team — all invoices summed</p>
+      <canvas id="bBarChart"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3 id="bRoiTitle">Cost vs Usage — All Time</h3>
+      <p>Spend vs conversations per team — value for money comparison</p>
+      <canvas id="bRoiChart"></canvas>
+    </div>
+  </div>
+
+  <div style="margin-top:18px;">
+    <div class="tbl-card">
+      <div class="tbl-hdr" style="padding:14px 22px;">
+        <h3>Invoice Log</h3>
+        <span id="bTblCaption" style="font-size:12px;color:var(--muted);">All accounts · Apr–Jun 2026</span>
+      </div>
+      <table>
+        <thead><tr>
+          <th>Date</th><th>Account</th><th>Type</th><th>Members Added</th><th>Amount (USD)</th><th>Status</th>
+        </tr></thead>
+        <tbody id="bTBody"></tbody>
+        <tfoot><tr id="bTFoot" style="background:#212536;font-weight:700;"></tr></tfoot>
+      </table>
+    </div>
+  </div>
+
 </div>
 
 <div class="footer">
-  Dhwani Rural Information Systems &nbsp;|&nbsp; Claude AI Dashboard — Product &amp; Services &nbsp;|&nbsp; June 4, 2026<br>
+  Dhwani Rural Information Systems &nbsp;|&nbsp; Claude AI Dashboard — Product &amp; Services &amp; Dhwani ORG &nbsp;|&nbsp; June 2026<br>
   <span style="color:#ef444466;font-size:11px;">⚠ Not in members list (excluded): Product — om.prakash (Apr: 14,681), fathima.nihala (Apr: 601) &nbsp;|&nbsp; Services — shlok (Apr: 39,541), vivek.kumar (Apr: 1,453 | May: 2,315) &nbsp;|&nbsp; Dhwani ORG — navneet.patteri (Apr: 61,580 | May: 11,734), samarth.paul (Apr: 29,739 | May: 5,450), suresh.mali (Apr: 25,090 | May: 68,601), harshdeep (Apr: 9,501), pooja.srivastava (Apr: 5,210)</span>
 </div>
 
 <script>
-var BL='#6b8afd',OR='#f97316',GR='#22c55e',PU='#a855f7',RE='#ef4444',GRID='#2e3248',TX='#8892aa';
+var BL='#6b8afd',OR='#f97316',TE='#06b6d4',GR='#22c55e',PU='#a855f7',RE='#ef4444',YL='#facc15',GRID='#2e3248',TX='#8892aa';
 Chart.defaults.color=TX; Chart.defaults.borderColor=GRID; Chart.defaults.font.family="'Segoe UI',system-ui,sans-serif";
 
 var P={
@@ -1106,9 +1147,166 @@ function sortTable(col){
   buildTable();
 }
 
+// ── BILLING DATA ─────────────────────────────────────────────────────────────
+var BILLING_INVOICES=[
+  // Product
+  {month:'2026-06',acct:'product',members:1, amount:1150.00,status:'paid',   date:'Jun 2, 2026'},
+  {month:'2026-05',acct:'product',members:0, amount:87.76,  status:'paid',   date:'May 11, 2026'},
+  {month:'2026-05',acct:'product',members:1, amount:1025.00,status:'paid',   date:'May 2, 2026'},
+  {month:'2026-04',acct:'product',members:0, amount:49.12,  status:'paid',   date:'Apr 20, 2026'},
+  {month:'2026-04',acct:'product',members:0, amount:56.20,  status:'paid',   date:'Apr 15, 2026'},
+  {month:'2026-04',acct:'product',members:0, amount:59.08,  status:'paid',   date:'Apr 14, 2026'},
+  {month:'2026-04',acct:'product',members:0, amount:20.84,  status:'paid',   date:'Apr 7, 2026'},
+  {month:'2026-04',acct:'product',members:0, amount:344.06, status:'paid',   date:'Apr 6, 2026'},
+  {month:'2026-04',acct:'product',members:0, amount:116.18, status:'paid',   date:'Apr 4, 2026'},
+  {month:'2026-04',acct:'product',members:0, amount:24.05,  status:'paid',   date:'Apr 3, 2026'},
+  {month:'2026-04',acct:'product',members:5, amount:125.00, status:'paid',   date:'Apr 2, 2026'},
+  // Services
+  {month:'2026-06',acct:'services',members:2,amount:1175.00,status:'paid',   date:'Jun 4, 2026'},
+  {month:'2026-05',acct:'services',members:0,amount:26.84,  status:'paid',   date:'May 28, 2026'},
+  {month:'2026-05',acct:'services',members:0,amount:145.02, status:'paid',   date:'May 15, 2026'},
+  {month:'2026-05',acct:'services',members:0,amount:87.45,  status:'refund', date:'May 12, 2026'},
+  {month:'2026-05',acct:'services',members:0,amount:113.96, status:'refund', date:'May 5, 2026'},
+  {month:'2026-05',acct:'services',members:0,amount:399.94, status:'paid',   date:'May 4, 2026'},
+  {month:'2026-05',acct:'services',members:9,amount:225.00, status:'paid',   date:'May 4, 2026'},
+  {month:'2026-04',acct:'services',members:0,amount:456.61, status:'paid',   date:'Apr 6, 2026'},
+  {month:'2026-04',acct:'services',members:0,amount:24.33,  status:'paid',   date:'Apr 3, 2026'},
+  {month:'2026-04',acct:'services',members:0,amount:48.73,  status:'paid',   date:'Apr 3, 2026'},
+  {month:'2026-04',acct:'services',members:5,amount:125.00, status:'paid',   date:'Apr 2, 2026'},
+  // Dhwani ORG (Apr only within Apr-Jun window)
+  {month:'2026-04',acct:'org',members:0,amount:1078.41,status:'paid',date:'Apr 22, 2026'},
+  {month:'2026-04',acct:'org',members:0,amount:1108.89,status:'paid',date:'Apr 13, 2026'},
+  {month:'2026-04',acct:'org',members:0,amount:50.00,  status:'paid',date:'Apr 2, 2026'},
+  {month:'2026-04',acct:'org',members:0,amount:11.75,  status:'paid',date:'Apr 2, 2026'},
+  {month:'2026-04',acct:'org',members:0,amount:10.83,  status:'paid',date:'Apr 2, 2026'},
+  {month:'2026-04',acct:'org',members:0,amount:10.16,  status:'paid',date:'Apr 2, 2026'},
+  {month:'2026-04',acct:'org',members:0,amount:14.99,  status:'paid',date:'Apr 2, 2026'},
+  {month:'2026-04',acct:'org',members:0,amount:457.89, status:'paid',date:'Apr 2, 2026'},
+  {month:'2026-04',acct:'org',members:5,amount:0,      status:'paid',date:'Apr 2, 2026'} // seat included in $125 flat
+];
+
+// Monthly billing totals per team (Apr-Jun)
+var BILL={
+  product:{'2026-04':794.53,'2026-05':1112.76,'2026-06':1150.00,'all':3057.29},
+  services:{'2026-04':654.67,'2026-05':998.21, '2026-06':1175.00,'all':2827.88},
+  org:     {'2026-04':2742.92,'2026-05':0,      '2026-06':0,      'all':2742.92},
+  both:    {'2026-04':4192.12,'2026-05':2110.97,'2026-06':2325.00,'all':8628.09}
+};
+
+function fmtUSD(n){return n===0?'—':'$'+(Math.round(n*100)/100).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+
+var bBarInst=null, bRoiInst=null;
+
+function buildBilling(){
+  var teamKey=curTeam==='both'?'both':curTeam;
+  var billMonth=curMonth==='all'?'all':curMonth;
+  var spend=BILL[teamKey]?BILL[teamKey][billMonth]||0:0;
+  var convs_val, code_val;
+
+  // conversations and code for selected team/month
+  if(curMonth==='all'){
+    convs_val=curTeam==='both'?2122:curTeam==='product'?1189:curTeam==='services'?631:302;
+    code_val=curTeam==='both'?2652342:curTeam==='product'?896054:curTeam==='services'?1162172:594116;
+  } else {
+    convs_val=getConvs().reduce(function(s,v){return s+v;},0);
+    code_val=getCode().reduce(function(s,v){return s+v;},0);
+  }
+
+  var perConv=convs_val>0?(spend/convs_val).toFixed(2):'—';
+  var perLine=code_val>0?'$'+(spend/code_val).toFixed(4):'—';
+  var tLabel=teamLabel();
+
+  document.getElementById('bTotal').textContent='$'+Math.round(spend).toLocaleString();
+  document.getElementById('bTotalSub').textContent=tLabel+' · '+META[curMonth==='all'?'all':curMonth].label;
+  document.getElementById('bPerConv').textContent=perConv==='—'?'—':'$'+perConv;
+  document.getElementById('bPerConvSub').textContent='Per conversation · '+tLabel;
+  document.getElementById('bPerLine').textContent=perLine;
+  document.getElementById('bPerLineSub').textContent='Per code line · '+tLabel;
+  document.getElementById('bInvoices').textContent=BILLING_INVOICES.filter(function(i){
+    return (curTeam==='both'||i.acct===curTeam) && (curMonth==='all'||i.month===curMonth) && i.amount>0;
+  }).length;
+  document.getElementById('bInvoicesSub').textContent=tLabel+' · '+(curMonth==='all'?'Apr–Jun':'');
+
+  // Trend line
+  var trendStr='Apr $'+Math.round(BILL[teamKey]['2026-04']).toLocaleString()+' → May $'+Math.round(BILL[teamKey]['2026-05']).toLocaleString()+' → Jun $'+Math.round(BILL[teamKey]['2026-06']).toLocaleString();
+  document.getElementById('bTrendSub').textContent=trendStr;
+  var trend = BILL[teamKey]['2026-06'] > BILL[teamKey]['2026-04'] ? '↑' : BILL[teamKey]['2026-06'] < BILL[teamKey]['2026-04'] ? '↓' : '→';
+  document.getElementById('bTrend').textContent=trend;
+  document.getElementById('bTrend').style.color=trend==='↑'?'var(--red)':trend==='↓'?'var(--green)':'var(--muted)';
+
+  // Bar chart
+  var showTeams=curTeam==='both'?['product','services','org']:[curTeam];
+  var colors={product:BL,services:OR,org:TE};
+  var labels=['April','May','June'];
+  var datasets=showTeams.map(function(t){
+    return{label:t==='product'?'Product':t==='services'?'Services':'Dhwani ORG',
+      data:[BILL[t]['2026-04'],BILL[t]['2026-05'],BILL[t]['2026-06']],
+      backgroundColor:colors[t]+'cc',borderRadius:5,borderSkipped:false};
+  });
+  if(bBarInst){bBarInst.destroy();}
+  bBarInst=new Chart(document.getElementById('bBarChart'),{
+    type:'bar',data:{labels:labels,datasets:datasets},
+    options:{responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{position:'top',labels:{boxWidth:12,font:{size:12}}},
+        tooltip:{callbacks:{label:function(ctx){return' $'+ctx.parsed.y.toLocaleString('en-US',{minimumFractionDigits:2});}}}},
+      scales:{x:{grid:{color:GRID}},y:{grid:{color:GRID},beginAtZero:true,
+        ticks:{callback:function(v){return'$'+(v>=1000?(v/1000).toFixed(0)+'K':v);}}}}}
+  });
+  document.getElementById('bBarTitle').textContent='Monthly Spend'+(curTeam==='both'?' — All Teams':' — '+teamLabelShort());
+
+  // ROI comparison chart
+  var roiTeams=[
+    {label:'Product',   spend:3057.29,convs:1189,color:BL},
+    {label:'Services',  spend:2827.88,convs:631, color:OR},
+    {label:'Dhwani ORG',spend:2742.92,convs:302, color:TE}
+  ];
+  if(bRoiInst){bRoiInst.destroy();}
+  bRoiInst=new Chart(document.getElementById('bRoiChart'),{
+    type:'bar',
+    data:{
+      labels:roiTeams.map(function(t){return t.label;}),
+      datasets:[
+        {label:'Spend ($)',data:roiTeams.map(function(t){return t.spend;}),backgroundColor:roiTeams.map(function(t){return t.color+'cc';}),borderRadius:5,yAxisID:'y'},
+        {label:'Conversations',data:roiTeams.map(function(t){return t.convs;}),backgroundColor:roiTeams.map(function(t){return t.color+'44';}),borderRadius:5,borderDash:[4,4],yAxisID:'y2'}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{position:'top',labels:{boxWidth:12,font:{size:12}}}},
+      scales:{
+        x:{grid:{color:GRID}},
+        y:{grid:{color:GRID},beginAtZero:true,title:{display:true,text:'Spend ($)'},ticks:{callback:function(v){return'$'+(v/1000).toFixed(0)+'K';}}},
+        y2:{position:'right',beginAtZero:true,grid:{display:false},title:{display:true,text:'Conversations'}}
+      }
+    }
+  });
+
+  // Invoice table
+  var rows=BILLING_INVOICES.filter(function(i){
+    return (curTeam==='both'||i.acct===curTeam) && (curMonth==='all'||i.month===curMonth) && i.amount>0;
+  });
+  var total=rows.reduce(function(s,i){return s+i.amount;},0);
+  var html='';
+  rows.forEach(function(inv){
+    var ab=inv.acct==='product'?'<span style="padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600;background:rgba(107,138,253,.15);color:var(--blue);">Product</span>':
+           inv.acct==='services'?'<span style="padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600;background:rgba(249,115,22,.12);color:var(--orange);">Services</span>':
+           '<span style="padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600;background:rgba(6,182,212,.12);color:var(--teal);">Dhwani ORG</span>';
+    var tb=inv.members>0?'<span style="padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600;background:rgba(168,85,247,.12);color:var(--purple);">Seat Purchase</span>':'<span style="font-size:12px;color:var(--muted);">Usage / Overage</span>';
+    var sb=inv.status==='paid'?'<span style="padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600;background:rgba(34,197,94,.1);color:var(--green);">Paid</span>':
+           '<span style="padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600;background:rgba(250,204,21,.1);color:#facc15;">Partial Refund</span>';
+    var mb=inv.members>0?'<strong>+'+inv.members+'</strong>':'<span style="color:var(--muted);">—</span>';
+    html+='<tr><td>'+inv.date+'</td><td>'+ab+'</td><td>'+tb+'</td><td>'+mb+'</td><td style="font-weight:600;font-family:monospace;">'+fmtUSD(inv.amount)+'</td><td>'+sb+'</td></tr>';
+  });
+  document.getElementById('bTBody').innerHTML=html;
+  document.getElementById('bTFoot').innerHTML=
+    '<td colspan="4" style="padding:10px 20px;color:var(--muted);">Total — '+rows.length+' invoices · '+tLabel+'</td>'+
+    '<td style="padding:10px 20px;font-weight:700;font-family:monospace;color:#facc15;font-size:15px;">'+fmtUSD(total)+'</td><td></td>';
+  document.getElementById('bTblCaption').textContent=rows.length+' invoices · '+tLabel+' · '+(curMonth==='all'?'Apr–Jun 2026':META[curMonth].label);
+}
+
 function refresh(){
   updateKPIs(); updateCodeHL(); buildDaily(); buildMonthly();
   buildUserConv(); buildCodeChart(); buildUtil(); buildTable(); buildInactive();
+  buildBilling();
   updateSortHeaders();
 }
 
