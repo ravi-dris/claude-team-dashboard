@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Billing Dashboard — All Accounts</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0f1117;--card:#1a1d27;--card2:#212536;--border:#2e3248;--blue:#6b8afd;--orange:#f97316;--teal:#06b6d4;--green:#22c55e;--red:#ef4444;--yellow:#facc15;--purple:#a855f7;--text:#e2e8f0;--muted:#8892aa;--font:'Segoe UI',system-ui,sans-serif;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;}
+.header{background:linear-gradient(135deg,#1a1d27,#212536);border-bottom:1px solid var(--border);padding:24px 40px;display:flex;justify-content:space-between;align-items:center;}
+.header h1{font-size:22px;font-weight:700;color:#fff;}
+.header h1 span{color:var(--yellow);}
+.meta{text-align:right;color:var(--muted);font-size:13px;line-height:1.8;}
+.meta strong{color:var(--text);}
+.filter-bar{background:var(--card);border-bottom:1px solid var(--border);padding:11px 40px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;}
+.filter-label{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.8px;text-transform:uppercase;width:80px;flex-shrink:0;}
+.fbtn{padding:6px 16px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:13px;font-family:var(--font);font-weight:500;transition:all .15s;}
+.fbtn:hover{color:var(--text);}
+.fbtn.active{background:var(--yellow);border-color:var(--yellow);color:#111;font-weight:700;}
+.filter-note{margin-left:auto;font-size:12px;color:var(--muted);}
+.container{max-width:1400px;margin:0 auto;padding:28px 40px;}
+.sec{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin:32px 0 14px;display:flex;align-items:center;gap:10px;}
+.sec::after{content:'';flex:1;height:1px;background:var(--border);}
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;}
+.kpi .lbl{font-size:12px;color:var(--muted);margin-bottom:6px;}
+.kpi .val{font-size:24px;font-weight:700;color:#fff;line-height:1;margin-bottom:5px;}
+.kpi .sub{font-size:12px;}
+.up{color:var(--green);}.dn{color:var(--red);}.neu{color:var(--muted);}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;}
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px;}
+.chart-card h3{font-size:14px;font-weight:600;margin-bottom:4px;}
+.chart-card p{font-size:12px;color:var(--muted);margin-bottom:18px;}
+.chart-card canvas{max-height:280px;}
+.tbl-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.tbl-hdr{padding:16px 22px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.tbl-hdr h3{font-size:14px;font-weight:600;}
+table{width:100%;border-collapse:collapse;}
+th{text-align:left;font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);padding:9px 20px;background:#1e2130;border-bottom:1px solid var(--border);}
+td{padding:10px 20px;font-size:13px;border-bottom:1px solid #1e2130;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#1e2130;}
+.badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600;}
+.b-paid{background:rgba(34,197,94,.1);color:var(--green);}
+.b-ref{background:rgba(250,204,21,.1);color:var(--yellow);}
+.b-p{background:rgba(107,138,253,.15);color:var(--blue);}
+.b-s{background:rgba(249,115,22,.12);color:var(--orange);}
+.b-o{background:rgba(6,182,212,.12);color:var(--teal);}
+.b-seat{background:rgba(168,85,247,.12);color:var(--purple);}
+.insight-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.ic{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;}
+.ic h3{font-size:14px;font-weight:600;margin-bottom:10px;}
+.ic p{font-size:12px;color:var(--muted);line-height:1.8;}
+.ic strong{color:var(--text);}
+.footer{text-align:center;padding:24px 40px;color:var(--muted);font-size:12px;border-top:1px solid var(--border);margin-top:32px;}
+.amount{font-weight:600;font-family:monospace;}
+.ref-note{font-size:11px;color:var(--yellow);margin-left:6px;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:5px;letter-spacing:1px;text-transform:uppercase;">Dhwani Rural Information Systems</div>
+    <h1>Claude <span>Billing Dashboard</span></h1>
+    <div style="font-size:13px;color:var(--muted);margin-top:3px;" id="hSub">All Accounts · March – June 2026</div>
+  </div>
+  <div class="meta">
+    <div><strong>Report Date:</strong> June 8, 2026</div>
+    <div><strong>Accounts:</strong> Product (Ravi) · Services (Ankit) · Dhwani ORG (Swapnil)</div>
+    <div><strong>Currency:</strong> USD ($)</div>
+  </div>
+</div>
+
+<div class="filter-bar">
+  <span class="filter-label">Month</span>
+  <button class="fbtn active" id="btn-all"     onclick="setMonth('all')">All Months</button>
+  <button class="fbtn"        id="btn-mar"     onclick="setMonth('mar')">March 2026</button>
+  <button class="fbtn"        id="btn-apr"     onclick="setMonth('apr')">April 2026</button>
+  <button class="fbtn"        id="btn-may"     onclick="setMonth('may')">May 2026</button>
+  <button class="fbtn"        id="btn-jun"     onclick="setMonth('jun')">June 2026</button>
+  <div class="filter-note" id="fNote">Showing: All Months · All Accounts</div>
+</div>
+
+<div class="container">
+
+  <div class="sec">Billing Overview</div>
+  <div class="kpi-grid">
+    <div class="kpi" style="border-color:rgba(250,204,21,.3)"><div class="lbl">Total Spend</div><div class="val" id="kTotal" style="color:var(--yellow)">$11,049</div><div class="sub neu" id="kTotalSub">All accounts · Mar–Jun 2026</div></div>
+    <div class="kpi" style="border-color:rgba(107,138,253,.3)"><div class="lbl">Product Team</div><div class="val" id="kProduct" style="color:var(--blue)">$3,057</div><div class="sub neu" id="kProductSub">Apr–Jun 2026</div></div>
+    <div class="kpi" style="border-color:rgba(249,115,22,.3)"><div class="lbl">Services Team</div><div class="val" id="kServices" style="color:var(--orange)">$2,828</div><div class="sub neu" id="kServicesSub">Apr–Jun 2026</div></div>
+    <div class="kpi" style="border-color:rgba(6,182,212,.3)"><div class="lbl">Dhwani ORG</div><div class="val" id="kOrg" style="color:var(--teal)">$5,164</div><div class="sub neu" id="kOrgSub">Mar–Apr 2026 only</div></div>
+    <div class="kpi"><div class="lbl">Invoices Total</div><div class="val" id="kInvoices">38</div><div class="sub neu" id="kInvoicesSub">Across all accounts</div></div>
+  </div>
+
+  <div class="sec">Monthly Spend</div>
+  <div class="two-col">
+    <div class="chart-card">
+      <h3 id="barTitle">Monthly Spend by Account</h3>
+      <p>Total billed per month — all invoices summed</p>
+      <canvas id="barChart"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Cumulative Spend — All Accounts</h3>
+      <p>Running total from March 2026</p>
+      <canvas id="cumulChart"></canvas>
+    </div>
+  </div>
+
+  <div class="sec">Account Share</div>
+  <div class="two-col">
+    <div class="chart-card">
+      <h3 id="pieTitle">Spend by Account</h3>
+      <p id="pieSub">Share of total billing for selected period</p>
+      <canvas id="pieChart" style="max-height:240px;"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Invoice Type Breakdown</h3>
+      <p>Seat purchases vs usage charges — all accounts combined</p>
+      <canvas id="typeChart" style="max-height:240px;"></canvas>
+    </div>
+  </div>
+
+  <div class="sec">All Invoices</div>
+  <div class="tbl-card">
+    <div class="tbl-hdr">
+      <h3>Invoice Log</h3>
+      <span id="tCaption" style="font-size:12px;color:var(--muted);">All accounts · All months · 38 invoices</span>
+    </div>
+    <table>
+      <thead><tr>
+        <th>Date</th><th>Account</th><th>Type</th><th>Members</th><th>Amount</th><th>Status</th>
+      </tr></thead>
+      <tbody id="tBody"></tbody>
+      <tfoot><tr id="tFoot" style="background:#212536;font-weight:700;"></tr></tfoot>
+    </table>
+  </div>
+
+  <div class="sec">Key Insights</div>
+  <div class="insight-grid">
+
+    <div class="ic" style="border-top:3px solid var(--teal);">
+      <h3 style="color:var(--teal)">✦ Dhwani ORG: Highest Spend, Lowest Activity</h3>
+      <p>Dhwani ORG accounts for <strong>$5,164 (47% of all spend)</strong>, yet only has 302 conversations and 594K code lines — the lowest activity of the three teams. Billing only runs through April (no May/June invoices). At <strong>$17/conversation</strong>, cost-per-use is the highest — likely driven by annual seat charges billed upfront.</p>
+    </div>
+
+    <div class="ic" style="border-top:3px solid var(--blue);">
+      <h3 style="color:var(--blue)">✦ Product Team: Best Value per Conversation</h3>
+      <p>Product spends <strong>$3,057</strong> for 1,189 conversations = <strong>$2.57 per conversation</strong> — best ROI of the three teams. May jumped to $1,113 with a new member add. June billing ($1,150) is consistent with May, suggesting stable seat count and usage going forward.</p>
+    </div>
+
+    <div class="ic" style="border-top:3px solid var(--orange);">
+      <h3 style="color:var(--orange)">✦ Services: Growing Fast</h3>
+      <p>Services billing has grown every month — April <strong>$655 → May $998 → June $1,175</strong> (+79% in two months). 9 members were added in May ($225 seat invoice). Two May invoices are <strong>Partially Refunded</strong> ($87.45 + $113.96) — worth checking what triggered those credits.</p>
+    </div>
+
+    <div class="ic" style="border-top:3px solid var(--green);">
+      <h3 style="color:var(--green)">✦ Combined: $2.57 avg cost per conversation</h3>
+      <p>Across all 3 teams, total Apr–Jun spend was <strong>$8,628</strong> (excluding March) for <strong>2,122 conversations</strong> = <strong>$4.07 per conversation</strong>. Per code line: 2.06M lines for ~$8K = <strong>$0.004 per AI-written line of code</strong> — a strong productivity ROI.</p>
+    </div>
+
+    <div class="ic" style="border-top:3px solid var(--yellow);">
+      <h3 style="color:var(--yellow)">✦ Seat Costs vs Usage Costs</h3>
+      <p>Seat invoices (with member count) total approximately <strong>$5,975</strong> across all accounts — 54% of all spend. Usage/overage invoices total ~<strong>$5,074</strong>. This means recurring seat costs are the larger driver. Adding members drives the biggest billing jumps.</p>
+    </div>
+
+    <div class="ic" style="border-top:3px solid var(--purple);">
+      <h3 style="color:var(--purple)">✦ April Was the Most Expensive Month</h3>
+      <p>April 2026 combined (all 3 accounts): <strong>$4,192</strong> — the highest single month, driven by Dhwani ORG's $2,743 April billing. May dropped to $2,111 (ORG had no billing). June is on track for ~$2,325. If Dhwani ORG has no further invoices, monthly spend is stabilising around <strong>$2,000–$2,300/month</strong>.</p>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="footer">
+  Dhwani RIS &nbsp;|&nbsp; Claude Billing Dashboard &nbsp;|&nbsp; June 8, 2026 &nbsp;|&nbsp; Source: claude.ai invoice pages — Product, Services &amp; Dhwani ORG accounts<br>
+  <span style="color:var(--yellow);font-size:11px;">⚠ Note: Partially Refunded invoices ($87.45, $113.96 — Services May) included at face value. Actual net spend may be lower.</span>
+</div>
+
+<script>
+var BL='#6b8afd',OR='#f97316',TE='#06b6d4',GR='#22c55e',YL='#facc15',RE='#ef4444',PU='#a855f7',GRID='#2e3248',TX='#8892aa';
+Chart.defaults.color=TX; Chart.defaults.borderColor=GRID; Chart.defaults.font.family="'Segoe UI',system-ui,sans-serif";
+
+// ── ALL INVOICES ──────────────────────────────────────────────────────────────
+var INVOICES = [
+  // Product Team
+  {date:'Jun 2, 2026',  month:'jun', acct:'product', members:1,  amount:1150.00, status:'paid'},
+  {date:'May 11, 2026', month:'may', acct:'product', members:0,  amount:87.76,   status:'paid'},
+  {date:'May 2, 2026',  month:'may', acct:'product', members:1,  amount:1025.00, status:'paid'},
+  {date:'Apr 20, 2026', month:'apr', acct:'product', members:0,  amount:49.12,   status:'paid'},
+  {date:'Apr 15, 2026', month:'apr', acct:'product', members:0,  amount:56.20,   status:'paid'},
+  {date:'Apr 14, 2026', month:'apr', acct:'product', members:0,  amount:59.08,   status:'paid'},
+  {date:'Apr 7, 2026',  month:'apr', acct:'product', members:0,  amount:20.84,   status:'paid'},
+  {date:'Apr 6, 2026',  month:'apr', acct:'product', members:0,  amount:344.06,  status:'paid'},
+  {date:'Apr 4, 2026',  month:'apr', acct:'product', members:0,  amount:116.18,  status:'paid'},
+  {date:'Apr 3, 2026',  month:'apr', acct:'product', members:0,  amount:24.05,   status:'paid'},
+  {date:'Apr 2, 2026',  month:'apr', acct:'product', members:5,  amount:125.00,  status:'paid'},
+  // Services Team
+  {date:'Jun 4, 2026',  month:'jun', acct:'services', members:2, amount:1175.00, status:'paid'},
+  {date:'May 28, 2026', month:'may', acct:'services', members:0, amount:26.84,   status:'paid'},
+  {date:'May 15, 2026', month:'may', acct:'services', members:0, amount:145.02,  status:'paid'},
+  {date:'May 12, 2026', month:'may', acct:'services', members:0, amount:87.45,   status:'refund'},
+  {date:'May 5, 2026',  month:'may', acct:'services', members:0, amount:113.96,  status:'refund'},
+  {date:'May 4, 2026',  month:'may', acct:'services', members:0, amount:399.94,  status:'paid'},
+  {date:'May 4, 2026',  month:'may', acct:'services', members:9, amount:225.00,  status:'paid'},
+  {date:'Apr 6, 2026',  month:'apr', acct:'services', members:0, amount:456.61,  status:'paid'},
+  {date:'Apr 3, 2026',  month:'apr', acct:'services', members:0, amount:24.33,   status:'paid'},
+  {date:'Apr 3, 2026',  month:'apr', acct:'services', members:0, amount:48.73,   status:'paid'},
+  {date:'Apr 2, 2026',  month:'apr', acct:'services', members:5, amount:125.00,  status:'paid'},
+  // Dhwani ORG
+  {date:'Apr 22, 2026', month:'apr', acct:'org', members:0, amount:1078.41, status:'paid'},
+  {date:'Apr 13, 2026', month:'apr', acct:'org', members:0, amount:1108.89, status:'paid'},
+  {date:'Apr 2, 2026',  month:'apr', acct:'org', members:0, amount:50.00,   status:'paid'},
+  {date:'Apr 2, 2026',  month:'apr', acct:'org', members:0, amount:11.75,   status:'paid'},
+  {date:'Apr 2, 2026',  month:'apr', acct:'org', members:0, amount:10.83,   status:'paid'},
+  {date:'Apr 2, 2026',  month:'apr', acct:'org', members:0, amount:10.16,   status:'paid'},
+  {date:'Apr 2, 2026',  month:'apr', acct:'org', members:0, amount:14.99,   status:'paid'},
+  {date:'Apr 2, 2026',  month:'apr', acct:'org', members:0, amount:457.89,  status:'paid'},
+  {date:'Mar 20, 2026', month:'mar', acct:'org', members:0, amount:10.00,   status:'paid'},
+  {date:'Mar 19, 2026', month:'mar', acct:'org', members:0, amount:238.04,  status:'paid'},
+  {date:'Mar 19, 2026', month:'mar', acct:'org', members:0, amount:238.04,  status:'paid'},
+  {date:'Mar 19, 2026', month:'mar', acct:'org', members:0, amount:238.05,  status:'paid'},
+  {date:'Mar 19, 2026', month:'mar', acct:'org', members:0, amount:238.17,  status:'paid'},
+  {date:'Mar 18, 2026', month:'mar', acct:'org', members:0, amount:20.00,   status:'paid'},
+  {date:'Mar 18, 2026', month:'mar', acct:'org', members:0, amount:238.78,  status:'paid'},
+  {date:'Mar 16, 2026', month:'mar', acct:'org', members:5, amount:1200.00, status:'paid'}
+];
+
+var MONTHS=['mar','apr','may','jun'];
+var MONTH_LABELS={'mar':'March','apr':'April','may':'May','jun':'June'};
+
+function sumBy(month, acct){
+  return INVOICES.filter(function(i){
+    return (month==='all'||i.month===month) && (acct==='all'||i.acct===acct);
+  }).reduce(function(s,i){return s+i.amount;},0);
+}
+function countBy(month, acct){
+  return INVOICES.filter(function(i){
+    return (month==='all'||i.month===month) && (acct==='all'||i.acct===acct);
+  }).length;
+}
+function fmt(n){return '$'+(Math.round(n*100)/100).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+
+var curMonth='all';
+var barInst=null, pieInst=null;
+
+// ── CUMULATIVE CHART (static) ─────────────────────────────────────────────────
+var cumP=[794.53, 794.53+1112.76, 794.53+1112.76+1150];
+var cumS=[654.67, 654.67+998.21,  654.67+998.21+1175];
+var cumO=[2421.08, 2421.08+2742.92, 2421.08+2742.92, 2421.08+2742.92];
+
+new Chart(document.getElementById('cumulChart'),{
+  type:'line',
+  data:{
+    labels:['March','April','May','June'],
+    datasets:[
+      {label:'Product',  data:[0,794.53,1907.29,3057.29], borderColor:BL, backgroundColor:BL+'22', fill:true, tension:.3, borderWidth:2, pointRadius:4},
+      {label:'Services', data:[0,654.67,1652.88,2827.88], borderColor:OR, backgroundColor:OR+'22', fill:true, tension:.3, borderWidth:2, pointRadius:4},
+      {label:'Dhwani ORG',data:[2421.08,5164.00,5164.00,5164.00], borderColor:TE, backgroundColor:TE+'11', fill:true, tension:.3, borderWidth:2, pointRadius:4}
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:true,
+    plugins:{legend:{position:'top',labels:{boxWidth:12,font:{size:12}}}},
+    scales:{
+      x:{grid:{color:GRID}},
+      y:{grid:{color:GRID},beginAtZero:true,
+         ticks:{callback:function(v){return '$'+(v>=1000?(v/1000).toFixed(0)+'K':v);}}}
+    }
+  }
+});
+
+// ── Invoice Type Chart (static) ───────────────────────────────────────────────
+var seatTotal = INVOICES.filter(function(i){return i.members>0;}).reduce(function(s,i){return s+i.amount;},0);
+var usageTotal= INVOICES.filter(function(i){return i.members===0;}).reduce(function(s,i){return s+i.amount;},0);
+new Chart(document.getElementById('typeChart'),{
+  type:'doughnut',
+  data:{
+    labels:['Seat Purchases','Usage / Overage'],
+    datasets:[{data:[Math.round(seatTotal*100)/100, Math.round(usageTotal*100)/100],
+      backgroundColor:[PU+'cc',YL+'cc'],borderColor:'#1a1d27',borderWidth:3,hoverOffset:4}]
+  },
+  options:{responsive:true,maintainAspectRatio:true,cutout:'60%',
+    plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:12},padding:12}},
+      tooltip:{callbacks:{label:function(ctx){
+        var pct=Math.round(ctx.parsed/(seatTotal+usageTotal)*100);
+        return ' '+fmt(ctx.parsed)+' ('+pct+'%)';
+      }}}}}
+});
+
+// ── DYNAMIC BAR CHART ─────────────────────────────────────────────────────────
+function buildBar(){
+  var months = curMonth==='all' ? MONTHS : [curMonth];
+  var labels = months.map(function(m){return MONTH_LABELS[m];});
+  var dP = months.map(function(m){return Math.round(sumBy(m,'product')*100)/100;});
+  var dS = months.map(function(m){return Math.round(sumBy(m,'services')*100)/100;});
+  var dO = months.map(function(m){return Math.round(sumBy(m,'org')*100)/100;});
+  if(barInst){barInst.destroy();}
+  barInst=new Chart(document.getElementById('barChart'),{
+    type:'bar',
+    data:{labels:labels,datasets:[
+      {label:'Product',    data:dP, backgroundColor:BL+'cc', borderRadius:5, borderSkipped:false},
+      {label:'Services',   data:dS, backgroundColor:OR+'cc', borderRadius:5, borderSkipped:false},
+      {label:'Dhwani ORG', data:dO, backgroundColor:TE+'cc', borderRadius:5, borderSkipped:false}
+    ]},
+    options:{responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{position:'top',labels:{boxWidth:12,font:{size:12}}},
+        tooltip:{callbacks:{label:function(ctx){return ' '+fmt(ctx.parsed.y);}}}},
+      scales:{x:{grid:{color:GRID}},y:{grid:{color:GRID},beginAtZero:true,
+        ticks:{callback:function(v){return '$'+(v>=1000?(v/1000).toFixed(0)+'K':v);}}}}
+    }
+  });
+  document.getElementById('barTitle').textContent='Monthly Spend by Account'+(curMonth==='all'?'':' — '+MONTH_LABELS[curMonth]);
+}
+
+// ── DYNAMIC PIE CHART ─────────────────────────────────────────────────────────
+function buildPie(){
+  var p=sumBy(curMonth,'product'), s=sumBy(curMonth,'services'), o=sumBy(curMonth,'org');
+  var total=p+s+o;
+  if(pieInst){pieInst.destroy();}
+  pieInst=new Chart(document.getElementById('pieChart'),{
+    type:'doughnut',
+    data:{
+      labels:['Product','Services','Dhwani ORG'],
+      datasets:[{data:[Math.round(p*100)/100,Math.round(s*100)/100,Math.round(o*100)/100],
+        backgroundColor:[BL+'cc',OR+'cc',TE+'cc'],borderColor:'#1a1d27',borderWidth:3,hoverOffset:4}]
+    },
+    options:{responsive:true,maintainAspectRatio:true,cutout:'58%',
+      plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:12},padding:12}},
+        tooltip:{callbacks:{label:function(ctx){
+          var pct=total>0?Math.round(ctx.parsed/total*100):0;
+          return' '+fmt(ctx.parsed)+' ('+pct+'%)';
+        }}}}}
+  });
+  var lbl=curMonth==='all'?'All Months':''+MONTH_LABELS[curMonth]+' 2026';
+  document.getElementById('pieTitle').textContent='Spend by Account — '+lbl;
+  document.getElementById('pieSub').textContent='Share of billing for '+lbl;
+}
+
+// ── DYNAMIC TABLE ─────────────────────────────────────────────────────────────
+function buildTable(){
+  var rows=INVOICES.filter(function(i){return curMonth==='all'||i.month===curMonth;});
+  var total=rows.reduce(function(s,i){return s+i.amount;},0);
+
+  var html='';
+  rows.forEach(function(inv){
+    var acctBadge=inv.acct==='product'?'<span class="badge b-p">Product</span>':inv.acct==='services'?'<span class="badge b-s">Services</span>':'<span class="badge b-o">Dhwani ORG</span>';
+    var typeBadge=inv.members>0?'<span class="badge b-seat">Seat Purchase</span>':'<span style="font-size:12px;color:var(--muted);">Usage / Overage</span>';
+    var statusBadge=inv.status==='paid'?'<span class="badge b-paid">Paid</span>':'<span class="badge b-ref">Partially Refunded</span>';
+    var membersCell=inv.members>0?'<strong>+'+inv.members+'</strong>':'<span style="color:var(--muted);">—</span>';
+    html+='<tr>';
+    html+='<td>'+inv.date+'</td>';
+    html+='<td>'+acctBadge+'</td>';
+    html+='<td>'+typeBadge+'</td>';
+    html+='<td>'+membersCell+'</td>';
+    html+='<td class="amount">'+fmt(inv.amount)+'</td>';
+    html+='<td>'+statusBadge+'</td>';
+    html+='</tr>';
+  });
+  document.getElementById('tBody').innerHTML=html;
+
+  // Footer total
+  document.getElementById('tFoot').innerHTML=
+    '<td colspan="4" style="padding:10px 20px;color:var(--muted);">Total — '+rows.length+' invoices</td>'+
+    '<td class="amount" style="padding:10px 20px;color:var(--yellow);font-size:16px;">'+fmt(total)+'</td>'+
+    '<td style="padding:10px 20px;"></td>';
+
+  document.getElementById('tCaption').textContent=rows.length+' invoices · '+(curMonth==='all'?'All months':MONTH_LABELS[curMonth]+' 2026');
+}
+
+// ── KPI UPDATE ────────────────────────────────────────────────────────────────
+function updateKPIs(){
+  var p=sumBy(curMonth,'product'), s=sumBy(curMonth,'services'), o=sumBy(curMonth,'org');
+  var total=p+s+o;
+  var cnt=countBy(curMonth,'all');
+  var lbl=curMonth==='all'?'All months':MONTH_LABELS[curMonth]+' 2026';
+
+  document.getElementById('kTotal').textContent='$'+Math.round(total).toLocaleString();
+  document.getElementById('kTotalSub').textContent='All accounts · '+lbl;
+  document.getElementById('kProduct').textContent='$'+Math.round(p).toLocaleString();
+  document.getElementById('kProductSub').textContent='Product · '+lbl;
+  document.getElementById('kServices').textContent='$'+Math.round(s).toLocaleString();
+  document.getElementById('kServicesSub').textContent='Services · '+lbl;
+  document.getElementById('kOrg').textContent='$'+Math.round(o).toLocaleString();
+  document.getElementById('kOrgSub').textContent='Dhwani ORG · '+lbl;
+  document.getElementById('kInvoices').textContent=cnt;
+  document.getElementById('kInvoicesSub').textContent='Invoices · '+lbl;
+  document.getElementById('hSub').textContent='All Accounts · '+(curMonth==='all'?'March – June 2026':MONTH_LABELS[curMonth]+' 2026');
+  document.getElementById('fNote').textContent='Showing: '+(curMonth==='all'?'All Months':MONTH_LABELS[curMonth]+' 2026')+' · All Accounts';
+}
+
+// ── FILTER ────────────────────────────────────────────────────────────────────
+function setMonth(m){
+  curMonth=m;
+  ['all','mar','apr','may','jun'].forEach(function(k){
+    document.getElementById('btn-'+k).className='fbtn'+(k===m?' active':'');
+  });
+  updateKPIs();
+  buildBar();
+  buildPie();
+  buildTable();
+}
+
+setMonth('all');
+</script>
+</body>
+</html>
