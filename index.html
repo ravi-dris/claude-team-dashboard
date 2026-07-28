@@ -148,8 +148,8 @@ tr:hover td{background:#1e2130;}
   <div class="sec">Overall Performance</div>
   <div class="explain"><b>Total Conversations</b> = chat sessions started. <b>Messages Sent</b> = prompts by team members. <b>Active Members</b> = had at least 1 conversation. <b>Inactive</b> = 0 conversations AND last activity (chat + Claude Code) more than 14 days ago.</div>
   <div class="kpi-grid">
-    <div class="kpi"><div class="lbl">Total Conversations</div><div class="val" id="kConvs">3,071</div><div class="sub neu" id="kConvsSub">All Teams · All Time</div></div>
-    <div class="kpi"><div class="lbl">Messages Sent</div><div class="val" id="kMsgs">25,183</div><div class="sub neu" id="kMsgsSub">Human prompts · All Time</div></div>
+    <div class="kpi"><div class="lbl">Total Conversations</div><div class="val" id="kConvs">3,824</div><div class="sub neu" id="kConvsSub">All Teams · All Time</div></div>
+    <div class="kpi"><div class="lbl">Messages Sent</div><div class="val" id="kMsgs">28,604</div><div class="sub neu" id="kMsgsSub">Human prompts · All Time</div></div>
     <div class="kpi"><div class="lbl">AI Responses</div><div class="val" id="kResp">25,335</div><div class="sub up">↑ 99.4% response rate</div></div>
     <div class="kpi"><div class="lbl">Active Members</div><div class="val" id="kUsers">37</div><div class="sub up" id="kUsersSub">37 of 37 active</div></div>
     <div class="kpi" style="border-color:rgba(239,68,68,.3)"><div class="lbl">Inactive Members</div><div class="val" id="kInactive" style="color:var(--red)">1</div><div class="sub dn" id="kInactiveSub">No activity this period</div></div>
@@ -162,7 +162,7 @@ tr:hover td{background:#1e2130;}
       <div style="font-size:11px;color:var(--green);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Adoption Health</div>
       <h3 style="font-size:16px;color:#fff;margin-bottom:12px;">AI is a daily work tool, not an experiment</h3>
       <div style="line-height:1.9;color:var(--muted);font-size:13px;">
-        Across four months the three teams have logged <strong style="color:var(--text)">25,183 prompts over 3,071 conversations</strong> — roughly 300+ prompts on most working days, weekends included. AI is embedded in how people work, not confined to office hours.<br><br>
+        Across four months the three teams have logged <strong style="color:var(--text)">28,604 prompts over 3,824 conversations</strong> — roughly 300+ prompts on most working days, weekends included. AI is embedded in how people work, not confined to office hours.<br><br>
         <strong style="color:var(--text)">36 of 37 members</strong> have used AI in the last 30 days — only one seat (Vishwa Patel) has gone dormant. All three team leads (Ravi, Ankit, Swapnil) remain active users, signalling sustained buy-in from the top down.
       </div>
     </div>
@@ -337,10 +337,10 @@ tr:hover td{background:#1e2130;}
         <span class="tb tb-p">Product</span>
       </div>
       <div style="display:flex;gap:12px;margin-bottom:10px;font-size:12px;">
-        <span style="color:var(--muted);">11 convs</span><span style="color:var(--muted);">36 msgs</span><span style="color:var(--muted);">3.3 avg</span><span style="color:var(--purple);">48K code</span>
+        <span style="color:var(--muted);">764 convs</span><span style="color:var(--muted);">3,457 msgs</span><span style="color:var(--muted);">4.5 avg</span><span style="color:var(--purple);">208K code</span>
       </div>
-      <div style="font-size:11px;padding:3px 8px;border-radius:4px;background:rgba(168,85,247,.12);color:var(--purple);display:inline-block;margin-bottom:8px;">Silent Coder</div>
-      <div style="font-size:12px;color:var(--muted);line-height:1.7;">Just 11 chat sessions but 48K code lines. Chat topics include AI learning paths and WHO proposal work. His low chat volume masks active Claude Code usage — he works in the terminal, not the browser.</div>
+      <div style="font-size:11px;padding:3px 8px;border-radius:4px;background:rgba(168,85,247,.12);color:var(--purple);display:inline-block;margin-bottom:8px;">Top Coder — CLI</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.7;">One of Product's heaviest Claude Code users — <strong style="color:var(--text)">145,524 lines written in July</strong> (13,799 in June) across 702 terminal sessions. His earlier activity ran under a separate login, so his true output only surfaced after correction. Figures are from Claude Code CLI logs (gross lines written) — terminal-first, not browser.</div>
     </div>
 
     <div style="background:var(--card);border:1px solid var(--border);border-left:3px solid var(--purple);border-radius:12px;padding:18px 20px;">
@@ -656,7 +656,7 @@ tr:hover td{background:#1e2130;}
   <div class="sec" id="codeSec">Claude Code Highlights — All Time · Both Teams</div>
   <div class="explain"><b>Lines Accepted</b> = AI-written code kept by developers. Updates with both filters. Acceptance rate is only available for Product team May 2026.</div>
   <div class="hl-grid">
-    <div class="hl gr"><div class="hl-lbl">Lines of Code Accepted</div><div class="hl-val" id="hlLines">5,807,365</div><div class="hl-sub" id="hlLinesSub">All Teams · All Time</div></div>
+    <div class="hl gr"><div class="hl-lbl">Lines of Code Accepted</div><div class="hl-val" id="hlLines">5,966,688</div><div class="hl-sub" id="hlLinesSub">All Teams · All Time</div></div>
     <div class="hl"><div class="hl-lbl">Suggestion Accept Rate</div><div class="hl-val" id="hlRate">99.8%</div><div class="hl-sub" id="hlRateSub">Product Team · May 2026 only</div></div>
     <div class="hl or"><div class="hl-lbl">Top Code Contributor</div><div class="hl-val" id="hlTop">745,398</div><div class="hl-sub" id="hlTopSub">Lines — ankit.jangir (Services)</div></div>
     <div class="hl pu"><div class="hl-lbl">Active Code Users</div><div class="hl-val" id="hlUsers">34 / 37</div><div class="hl-sub" id="hlUsersSub">Members with code lines</div></div>
@@ -771,11 +771,11 @@ var P={
     {name:'Nihaan Mohammed',email:'nihaan.mohammed@dhwaniris.com',ini:'NM',role:'User',         tier:'Premium', team:'product'},
     {name:'Abhijit Nair',   email:'abhijit.nair@dhwaniris.com',   ini:'AB',role:'User',         tier:'Premium', team:'product'}
   ],
-  convs:{'all':[338,293,261,201,178,184,73,11,11,6],'2026-04':[229,37,119,54,47,68,27,10,3,0],'2026-05':[69,207,73,67,56,29,26,0,2,3],'2026-06':[21,37,50,57,35,59,14,0,0,1],'2026-07':[19,12,19,23,40,28,6,1,6,2]},
-  msgs:{'all':[1909,1405,2666,1668,2128,1568,1146,88,36,23],'2026-04':[1423,226,1326,576,412,608,678,75,8,0],'2026-05':[343,833,761,505,449,157,257,0,3,14],'2026-06':[76,288,508,403,644,537,171,0,0,3],'2026-07':[67,58,71,184,623,266,40,13,25,6]},
-  code:{'all':[57110,213183,79605,205861,16881,242409,533791,52879,48380,464292],'2026-04':[0,28417,288,45505,4121,35858,83636,0,48380,0],'2026-05':[0,105082,9320,57984,4769,45798,239916,0,0,165880],'2026-06':[9728,50027,30798,30273,1253,100240,121598,10883,0,169189],'2026-07':[47382,29657,39199,72099,6738,60513,88641,41996,0,129223]},
+  convs:{'all':[338,293,261,201,178,184,73,11,764,6],'2026-04':[229,37,119,54,47,68,27,10,3,0],'2026-05':[69,207,73,67,56,29,26,0,2,3],'2026-06':[21,37,50,57,35,59,14,0,57,1],'2026-07':[19,12,19,23,40,28,6,1,702,2]},
+  msgs:{'all':[1909,1405,2666,1668,2128,1568,1146,88,3457,23],'2026-04':[1423,226,1326,576,412,608,678,75,8,0],'2026-05':[343,833,761,505,449,157,257,0,3,14],'2026-06':[76,288,508,403,644,537,171,0,361,3],'2026-07':[67,58,71,184,623,266,40,13,3085,6]},
+  code:{'all':[57110,213183,79605,205861,16881,242409,533791,52879,207703,464292],'2026-04':[0,28417,288,45505,4121,35858,83636,0,48380,0],'2026-05':[0,105082,9320,57984,4769,45798,239916,0,0,165880],'2026-06':[9728,50027,30798,30273,1253,100240,121598,10883,13799,169189],'2026-07':[47382,29657,39199,72099,6738,60513,88641,41996,145524,129223]},
   last:['2026-07-22','2026-07-22','2026-07-22','2026-07-22','2026-07-22','2026-07-23','2026-07-22','2026-07-22','2026-07-23','2026-07-22'],
-  monthly:{'2026-04':{c:608,m:5398,u:9},'2026-05':{c:532,m:3322,u:9},'2026-06':{c:274,m:2630,u:8},'2026-07':{c:156,m:1353,u:10}},
+  monthly:{'2026-04':{c:608,m:5398,u:9},'2026-05':{c:532,m:3322,u:9},'2026-06':{c:331,m:2991,u:9},'2026-07':{c:852,m:4413,u:10}},
   daily:{
     '2026-04':{L:['Apr 02','Apr 03','Apr 05','Apr 06','Apr 07','Apr 08','Apr 09','Apr 10','Apr 11','Apr 12','Apr 13','Apr 14','Apr 15','Apr 16','Apr 17','Apr 18','Apr 19','Apr 20','Apr 21','Apr 22','Apr 23','Apr 24','Apr 25','Apr 26','Apr 27','Apr 28','Apr 29','Apr 30'],D:[5,9,6,20,32,34,24,16,7,3,30,21,16,26,14,9,6,30,12,33,41,42,17,16,36,40,30,33]},
     '2026-05':{L:['May 05','May 06','May 07','May 08','May 09','May 10','May 11','May 12','May 13','May 14','May 15','May 16','May 17','May 18','May 19','May 20','May 21','May 22','May 23','May 24','May 25','May 26','May 27','May 28','May 29','May 30','May 31'],D:[18,23,17,19,11,5,25,14,18,20,43,3,4,11,32,28,23,22,4,3,36,25,15,26,14,4,3]},
@@ -870,18 +870,18 @@ var O={
 
 var CODE_HL={
   both:{
-    all:     {lines:'5,807,365',rate:'99.8% (Product·May)',top:'745,398',topWho:'ankit.jangir (Services)',users:'34 / 37'},
+    all:     {lines:'5,966,688',rate:'99.8% (Product·May)',top:'745,398',topWho:'ankit.jangir (Services)',users:'34 / 37'},
     '2026-04':{lines:'845,661',rate:'N/A',top:'226,319',topWho:'ankit.jangir (Services)',users:'21 / 37'},
     '2026-05':{lines:'1,657,969',rate:'99.8% (Product)',top:'239,916',topWho:'ravi.jangir (Product)',users:'25 / 37'},
-    '2026-06':{lines:'1,731,923',rate:'N/A',top:'240,680',topWho:'ankit.jangir (Services)',users:'31 / 37'},
-    '2026-07':{lines:'1,572,812',rate:'N/A',top:'129,223',topWho:'abhijit.nair (Product)',users:'33 / 37'}
+    '2026-06':{lines:'1,745,722',rate:'N/A',top:'240,680',topWho:'ankit.jangir (Services)',users:'32 / 37'},
+    '2026-07':{lines:'1,718,336',rate:'N/A',top:'145,524',topWho:'nihaan.mohammed (Product)',users:'34 / 37'}
   },
   product:{
-    all:     {lines:'1,914,391',rate:'99.8% (May)',top:'533,791',topWho:'ravi.jangir',users:'10 / 10'},
+    all:     {lines:'2,073,714',rate:'99.8% (May)',top:'533,791',topWho:'ravi.jangir',users:'10 / 10'},
     '2026-04':{lines:'246,205',rate:'N/A',top:'83,636',topWho:'ravi.jangir',users:'7 / 10'},
     '2026-05':{lines:'628,749',rate:'99.8%',top:'239,916',topWho:'ravi.jangir',users:'7 / 10'},
-    '2026-06':{lines:'523,989',rate:'N/A',top:'169,189',topWho:'abhijit.nair',users:'9 / 10'},
-    '2026-07':{lines:'515,448',rate:'N/A',top:'129,223',topWho:'abhijit.nair',users:'9 / 10'}
+    '2026-06':{lines:'537,788',rate:'N/A',top:'169,189',topWho:'abhijit.nair',users:'10 / 10'},
+    '2026-07':{lines:'660,972',rate:'N/A',top:'145,524',topWho:'nihaan.mohammed',users:'10 / 10'}
   },
   services:{
     all:     {lines:'2,440,529',rate:'N/A',top:'745,398',topWho:'ankit.jangir',users:'10 / 11'},
@@ -958,8 +958,8 @@ function getCombinedDaily(month){
 function updateKPIs(){
   var totalC,totalM,activeU,tot=getTotalMbr();
   if(curMonth==='all'){
-    if(curTeam==='both'){totalC=3071;totalM=25183;activeU=37;}
-    else if(curTeam==='product'){totalC=1556;totalM=12637;activeU=10;}
+    if(curTeam==='both'){totalC=3824;totalM=28604;activeU=37;}
+    else if(curTeam==='product'){totalC=2309;totalM=16058;activeU=10;}
     else if(curTeam==='services'){totalC=975;totalM=9154;activeU=11;}
     else{totalC=540;totalM=3392;activeU=16;}
   } else {
