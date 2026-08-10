@@ -81,10 +81,10 @@ tr:hover td{background:#1e2130;}
   <div>
     <div style="font-size:11px;color:var(--muted);margin-bottom:5px;letter-spacing:1px;text-transform:uppercase;">Dhwani Rural Information Systems</div>
     <h1>General Hours <span>Timesheet Dashboard</span></h1>
-    <div style="font-size:13px;color:var(--muted);margin-top:3px;">April, May &amp; June 2026 — General Tasks Internal (DHW/P081)</div>
+    <div style="font-size:13px;color:var(--muted);margin-top:3px;">April – July 2026 — General Tasks Internal (DHW/P081)</div>
   </div>
   <div class="meta">
-    <div><strong>Report Date:</strong> July 23, 2026</div>
+    <div><strong>Report Date:</strong> August 10, 2026</div>
     <div><strong>Project:</strong> DHW/P081 — General Tasks Internal</div>
     <div><strong>Purpose:</strong> Track non-billable general hour submissions</div>
   </div>
@@ -96,6 +96,7 @@ tr:hover td{background:#1e2130;}
   <button class="fbtn" id="fbtn-apr"  onclick="setFilter('apr')">April 2026</button>
   <button class="fbtn" id="fbtn-may"  onclick="setFilter('may')">May 2026</button>
   <button class="fbtn" id="fbtn-jun"  onclick="setFilter('jun')">June 2026</button>
+  <button class="fbtn" id="fbtn-jul"  onclick="setFilter('jul')">July 2026</button>
   <div class="filter-note" id="fNote">Showing: All Months</div>
 </div>
 
@@ -104,11 +105,11 @@ tr:hover td{background:#1e2130;}
   <div class="sec">Overview</div>
   <div class="explain"><b>General Hours</b> = non-billable time submitted under DHW/P081. Lower is better. <b>Alert levels:</b> <span style="color:var(--red)">High ≥ 5 days</span> needs a conversation. <span style="color:var(--orange)">Medium 2–5 days</span> is acceptable. <span style="color:var(--green)">Low &lt; 2 days</span> is fine.</div>
   <div class="kpi-grid">
-    <div class="kpi"><div class="lbl">April — Total General Days</div><div class="val">144.7</div><div class="sub neu">baseline</div></div>
-    <div class="kpi"><div class="lbl">May — Total General Days</div><div class="val">146.3</div><div class="sub up">↑ 1.1% vs April</div></div>
-    <div class="kpi" style="border-color:rgba(34,197,94,.35)"><div class="lbl">June — Total General Days</div><div class="val" style="color:var(--green)">130.3</div><div class="sub dn">↓ 11% vs May · 43 employees · 458 entries</div></div>
-    <div class="kpi" style="border-color:rgba(34,197,94,.3)"><div class="lbl">Meetings Share — June</div><div class="val" style="color:var(--green)">~53%</div><div class="sub dn">↓ from ~66% (Apr/May)</div></div>
-    <div class="kpi" style="border-color:rgba(239,68,68,.35)"><div class="lbl">Bench Time — June</div><div class="val" style="color:var(--red)">11.1</div><div class="sub up">↑ sharply from 0.75 (May)</div></div>
+    <div class="kpi"><div class="lbl">May — Total General Days</div><div class="val">146.3</div><div class="sub neu">Apr 144.7 → May 146.3</div></div>
+    <div class="kpi"><div class="lbl">June — Total General Days</div><div class="val" style="color:var(--green)">130.3</div><div class="sub dn">↓ 11% vs May · 43 employees</div></div>
+    <div class="kpi" style="border-color:rgba(239,68,68,.45)"><div class="lbl">July — Total General Days</div><div class="val" style="color:var(--red)">213.4</div><div class="sub up">↑ 64% vs June · 47 employees · 777 entries</div></div>
+    <div class="kpi" style="border-color:rgba(239,68,68,.35)"><div class="lbl">Onboarding — July</div><div class="val" style="color:var(--red)">40.6</div><div class="sub up">↑ from 4.8 (Jun) · 43% of the rise</div></div>
+    <div class="kpi" style="border-color:rgba(239,68,68,.35)"><div class="lbl">Bench Time — July</div><div class="val" style="color:var(--red)">20.0</div><div class="sub up">↑ from 11.1 (Jun) · 99% one person</div></div>
   </div>
 
   <div class="sec">Activity Breakdown</div>
@@ -119,7 +120,7 @@ tr:hover td{background:#1e2130;}
       <canvas id="actChart"></canvas>
     </div>
     <div class="chart-card">
-      <h3>Apr / May / Jun — Days by Category</h3>
+      <h3>Apr / May / Jun / Jul — Days by Category</h3>
       <p>Month-on-month comparison per activity type</p>
       <canvas id="compareChart"></canvas>
     </div>
@@ -133,8 +134,8 @@ tr:hover td{background:#1e2130;}
       <canvas id="topChart"></canvas>
     </div>
     <div class="chart-card">
-      <h3>June Spikes — Who Increased Significantly?</h3>
-      <p>Employees whose general hours rose notably from May to June — warrant a check-in.</p>
+      <h3>July Spikes — Who Increased Significantly?</h3>
+      <p>Employees whose general hours rose notably from June to July — warrant a check-in.</p>
       <canvas id="spikesChart"></canvas>
     </div>
   </div>
@@ -143,7 +144,7 @@ tr:hover td{background:#1e2130;}
   <div class="tbl-card">
     <div class="tbl-hdr">
       <h3>All Employees — General Hours Log</h3>
-      <span id="tCaption" style="font-size:12px;color:var(--muted);">Sorted by June days · All Months</span>
+      <span id="tCaption" style="font-size:12px;color:var(--muted);">Sorted by July days · All Months</span>
     </div>
     <table>
       <thead><tr>
@@ -152,10 +153,11 @@ tr:hover td{background:#1e2130;}
         <th class="no-sort">Job Title</th>
         <th onclick="sortTbl('apr')" id="th-apr">April Days</th>
         <th onclick="sortTbl('may')" id="th-may">May Days</th>
-        <th onclick="sortTbl('jun')" id="th-jun" class="sort-active sort-desc">June Days</th>
+        <th onclick="sortTbl('jun')" id="th-jun">June Days</th>
+        <th onclick="sortTbl('jul')" id="th-jul" class="sort-active sort-desc">July Days</th>
         <th onclick="sortTbl('total')" id="th-total">Total</th>
-        <th onclick="sortTbl('chg')" id="th-chg">Chg May→Jun</th>
-        <th class="no-sort">Jun Alert</th>
+        <th onclick="sortTbl('chg')" id="th-chg">Chg Jun→Jul</th>
+        <th class="no-sort">Jul Alert</th>
       </tr></thead>
       <tbody id="tBody"></tbody>
     </table>
@@ -164,34 +166,34 @@ tr:hover td{background:#1e2130;}
   <div class="sec">Key Insights</div>
   <div class="insight-grid">
 
-    <div class="ic" style="border-top-color:var(--green)">
-      <h3 style="color:var(--green)">✦ June Improved — Down 11%</h3>
-      <p>June general hours fell to <strong>130.3 days</strong> from <strong>146.3 (May)</strong> and <strong>144.7 (April)</strong> — the first meaningful reduction after two flat months (<strong>421.3 days</strong> across the quarter). A 16-day drop points to more people moving onto billable project work in June. The direction is right; the goal is to hold it.</p>
+    <div class="ic" style="border-top-color:var(--red)">
+      <h3 style="color:var(--red)">✦ July Jumped 64% — Reversing June's Gain</h3>
+      <p>General hours climbed to <strong>213.4 days</strong> from <strong>130.3 in June</strong> — an <strong>83-day increase</strong> that wipes out June's improvement and sets a new high for the period (<strong>634.7 days</strong> across four months). Entries rose from 458 to 777 and headcount from 43 to 47. This is the month to explain, not the trend to project.</p>
+    </div>
+
+    <div class="ic" style="border-top-color:var(--orange)">
+      <h3 style="color:var(--orange)">✦ Onboarding Is 43% of the Rise — Largely Expected</h3>
+      <p><strong>Employee Onboarding leapt 4.8 → 40.6 days</strong>, accounting for <strong>43% of the entire increase</strong>. Almost all of it is three people ramping up — <strong>Nitin Jangid (18.7)</strong>, <strong>Nandita Sharma (10.4)</strong> and <strong>Diksha Hazarika (8.6)</strong> = 93% of the category. New-joiner ramp-up is legitimate non-billable time, so treat this share as investment rather than leakage — but it should fall away in August.</p>
     </div>
 
     <div class="ic" style="border-top-color:var(--red)">
-      <h3 style="color:var(--red)">✦ Bench Time Jumped — Watch This</h3>
-      <p>Bench hours rose sharply to <strong>11.1 days in June</strong> — roughly 15× the <strong>0.75 (May)</strong> and up from <strong>1.1 (April)</strong>. It has gone from negligible to the <strong>third-largest</strong> general-hour category, and it is the one metric moving the wrong way. Confirm these people are now re-allocated to billable work.</p>
-    </div>
-
-    <div class="ic" style="border-top-color:var(--green)">
-      <h3 style="color:var(--green)">✦ Meetings Share Dropped to 53%</h3>
-      <p>Discussions and internal meetings fell to <strong>~53% of general hours</strong> in June (69.0 days) from ~66% in Apr/May (~98 / 94 days). A healthy shift — less time in meetings relative to other internal work. Still the single largest category, so continued review of recurring meetings remains worthwhile.</p>
+      <h3 style="color:var(--red)">✦ Even Excluding Onboarding, July Rose 38%</h3>
+      <p>Strip out onboarding entirely and July still runs <strong>172.9 days vs 125.5 in June — up 37.7%</strong>. So the new-joiner story explains under half the jump. The rest sits in <strong>meetings (+29.3 days)</strong>, <strong>Bench (+8.9)</strong> and <strong>KRA (+12.5)</strong> — all existing staff. This is the part that needs a management answer.</p>
     </div>
 
     <div class="ic" style="border-top-color:var(--red)">
-      <h3 style="color:var(--red)">✦ Two People = 29% of June</h3>
-      <p><strong>Kandhi Omprakash</strong> (16.1 → 21.0, the single highest) and <strong>Aditi Baitule Deshpande</strong> (18.9 → 16.6) together logged <strong>37.6 days — 29% of all June general hours</strong>. Both are senior roles carrying heavy POC / meeting load; reviewing their project allocation is the highest-leverage action this month.</p>
+      <h3 style="color:var(--red)">✦ Bench and KRA Are Each One Person</h3>
+      <p><strong>Bench doubled to 20.0 days — and 19.75 of it (99%) is Bhushan Barbuddhe alone</strong>, up from 12.4 in June across two months of accumulating bench time. Separately, <strong>KRA hit 17.3 days, of which Brahmjyot Singh is 16.8 (97%)</strong>. Two individuals account for <strong>36.6 non-billable days</strong>. These are the two most actionable conversations on this page.</p>
     </div>
 
     <div class="ic" style="border-top-color:var(--purple)">
-      <h3 style="color:var(--purple)">✦ Sharp June Spikes — Needs Review</h3>
-      <p><strong>Bhushan Barbuddhe</strong> is the standout — <strong>1.2 → 12.4 days</strong> (+11.3). <strong>Brahmjyot Singh</strong> (0.2 → 5.1) and new joiner <strong>Diksha Hazarika</strong> (5.2) also crossed into the High band. All three warrant a quick check on assignment status and billable allocation.</p>
+      <h3 style="color:var(--purple)">✦ High Band Grew to 12 People = 71% of the Month</h3>
+      <p><strong>12 employees logged ≥5 general days</strong> (up from 8 in June), and together they account for <strong>151.8 days — 71% of July</strong>. The steepest risers are <strong>Nitin Jangid (0.8 → 18.7)</strong>, <strong>Brahmjyot Singh (5.1 → 21.5)</strong> and <strong>Bhushan Barbuddhe (12.4 → 20.1)</strong>. Concentration is high, which means a handful of reallocation decisions would move the total substantially.</p>
     </div>
 
-    <div class="ic" style="border-top-color:var(--blue)">
-      <h3 style="color:var(--blue)">✦ POC Work Steady · 8 in High Band</h3>
-      <p>Software - POC held at <strong>30.4 days in June</strong> (vs 33.4 May, 23.4 April) — sustained prototyping. Meanwhile <strong>8 employees logged ≥5 general days</strong> (the High-alert threshold). If the POC effort converts to billable projects, it should ease both the POC line and those high submitters in the coming months.</p>
+    <div class="ic" style="border-top-color:var(--green)">
+      <h3 style="color:var(--green)">✦ Meetings Share Fell Again · POC Held Steady</h3>
+      <p>Meetings rose in absolute terms (69.0 → 98.4 days) but their <strong>share fell to 46%</strong> from 53% in June and ~66% in Apr/May — the third consecutive decline, so the meeting-discipline gains are real. <strong>Software-POC stayed flat at 28.9 days</strong> (vs 30.4 June), and <strong>Field Visit fell to 1.5</strong>. Outside the onboarding and bench lines, the underlying mix is stable.</p>
     </div>
 
   </div>
@@ -211,74 +213,82 @@ tr:hover td{background:#1e2130;}
 
 </div>
 
-<div class="footer">Dhwani RIS &nbsp;|&nbsp; General Hours Dashboard &nbsp;|&nbsp; July 23, 2026 &nbsp;|&nbsp; Source: General Tasks Timesheet Report (DHW/P081)</div>
+<div class="footer">Dhwani RIS &nbsp;|&nbsp; General Hours Dashboard &nbsp;|&nbsp; August 10, 2026 &nbsp;|&nbsp; Source: General Tasks Timesheet Report (DHW/P081)</div>
 
 <script>
 var BL='#6b8afd',OR='#f97316',GR='#22c55e',PU='#a855f7',RE='#ef4444',YL='#facc15',GRID='#2e3248',TX='#8892aa';
 Chart.defaults.color=TX; Chart.defaults.borderColor=GRID; Chart.defaults.font.family="'Segoe UI',system-ui,sans-serif";
 
 var DATA=[
-  {name:'Abhijit Nair', title:'Engineering Manager', apr:22, may:19, jun:5.6875},
-  {name:'Kandhi Omprakash', title:'SDE 3 - Full Stack', apr:19.375, may:16.125, jun:21},
-  {name:'Aditi Baitule Deshpande', title:'Sr. Project Manager', apr:4, may:18.9375, jun:16.625},
-  {name:'Suraj Singh', title:'SDE 1 - Full Stack', apr:2.875, may:12.6875, jun:7.8125},
-  {name:'Fahimuddin Sayyed', title:'Project Analyst', apr:7.5625, may:3.1875, jun:3.3125},
-  {name:'Shweta Singh', title:'Sr. Project Manager', apr:6.9375, may:5.375, jun:4.1875},
-  {name:'Anup Kumar Srivastav', title:'Team Lead - Full stack', apr:6.625, may:3.5125, jun:2.4062},
-  {name:'Bhushan Anilrao Barbuddhe', title:'Team Lead', apr:5.3125, may:1.1875, jun:12.4375},
-  {name:'Harshdeep Singh Mokha', title:'Sr. Project Manager', apr:3.8438, may:5, jun:8.9688},
-  {name:'Ritesh Negi', title:'Data Analyst', apr:4.6875, may:3.9375, jun:1.25},
-  {name:'Abhishek Prajapati', title:'Flutter Developer - Intern', apr:4.0375, may:2.6875, jun:1},
-  {name:'Shrey Jain', title:'Team Lead', apr:3.7813, may:2.1313, jun:1.0938},
-  {name:'Pranati Tiwari', title:'Associate Project Manager', apr:3.5938, may:2.6563, jun:2.6313},
-  {name:'Akshat Verma', title:'Product Analyst', apr:3.5625, may:0.125, jun:0.125},
-  {name:'Sparsh Verma', title:'SDE 1 - Frappe', apr:3.375, may:0, jun:0.3125},
-  {name:'Sureshkumar Mali', title:'Team Lead - Full stack', apr:2.9, may:0.6875, jun:0.1062},
-  {name:'Sachin Vinod Rathod', title:'QA Engineer', apr:2.8125, may:3.8125, jun:0.8125},
-  {name:'Krishna Maheshwari', title:'Associate Project Manager', apr:2.8125, may:3.1875, jun:3.6875},
-  {name:'Vanshika Sehgal', title:'SDE 1 - Full Stack', apr:2.5, may:3.3125, jun:1.5625},
-  {name:'Raman Mishra', title:'SDE 1 - Mobile Developer', apr:2.5, may:0.375, jun:0},
-  {name:'Pragat Singh', title:'Team Lead - Java', apr:2.25, may:3.625, jun:0},
-  {name:'Vishwa Patel', title:'Engagement Manager', apr:2.1875, may:0, jun:0.0625},
-  {name:'Kashish Talwani', title:'Associate Project Manager', apr:2.375, may:4.0625, jun:2.5},
-  {name:'Samarth Paul', title:'Associate Project Manager', apr:2, may:2.2813, jun:2.8438},
-  {name:'Sachin Sharma', title:'Data Engineer', apr:2, may:1.25, jun:0.25},
-  {name:'Mayur Sharma', title:'Associate Project Manager', apr:0.75, may:3.2563, jun:3.4688},
-  {name:'Tabseer Khan', title:'Data Engineer', apr:0.8125, may:3.25, jun:0.125},
-  {name:'Devang Bhatnagar', title:'SDE 1 - Frappe', apr:1.6188, may:3.15, jun:1.5938},
-  {name:'Nadge Sachin Laxi', title:'SDE 1 - Backend', apr:0, may:3, jun:0},
-  {name:'Rohit SIngh (Intern)', title:'Frappe - Intern', apr:1.875, may:0, jun:0},
-  {name:'Pooja Srivastava', title:'Project Analyst', apr:1.75, may:1.4063, jun:3.1875},
-  {name:'Samarth Rana', title:'Project Analyst', apr:1, may:2.9125, jun:1.5},
-  {name:'Harshit Sodhani', title:'SDE 1 - Full Stack', apr:1.0688, may:0.5313, jun:0.1875},
-  {name:'Bhanu Marwah', title:'Data Engineer', apr:1.0563, may:0.5563, jun:0.25},
-  {name:'Brahmjyot Singh', title:'Product Analyst', apr:1, may:0.1875, jun:5.125},
-  {name:'Dalbeer Kaur', title:'Sr. QA Engineer', apr:0.875, may:2.0625, jun:0},
-  {name:'Navneet Patteri', title:'SDE 1 - Frappe', apr:0.9375, may:1.5, jun:0.9375},
-  {name:'Himanshi Sharma', title:'Sr. Project Manager', apr:0.875, may:1, jun:0},
-  {name:'Nagesh Kashinath Koli', title:'Project Analyst', apr:0.8125, may:0, jun:0},
-  {name:'Chitranshi Jain', title:'Project Analyst', apr:0.8125, may:0.125, jun:0},
-  {name:'Rohit Singh (Sr.)', title:'Sr. Data Engineer', apr:0.5625, may:0.6875, jun:1.5625},
-  {name:'Hrushikesh Deodhar', title:'SDE 1 - PHP', apr:0.4375, may:0.25, jun:0.1875},
-  {name:'Aman Sharma', title:'Project Analyst', apr:0.375, may:0, jun:0},
-  {name:'Arpita Jain', title:'Project Manager', apr:0.375, may:0.375, jun:0.125},
-  {name:'Aditya Gore', title:'Team Lead - Full stack', apr:0.375, may:0, jun:0},
-  {name:'Namandeep', title:'Project Analyst', apr:0.3125, may:0.4375, jun:2.75},
-  {name:'Ankit Yadav', title:'SDE 1 - PHP', apr:0.25, may:0.0625, jun:0},
-  {name:'Fahad', title:'SDE 2 - Backend', apr:0.25, may:0, jun:0},
-  {name:'Amandeep Singh', title:'Sr. QA Engineer', apr:0.25, may:0.4375, jun:0.25},
-  {name:'Aastha Arora', title:'Sr. Project Manager', apr:0.125, may:0, jun:1.625},
-  {name:'Sunchay Singhal', title:'Project Analyst - Consultant', apr:0.125, may:0.5, jun:0},
-  {name:'Bhanu Prakash', title:'SDE 1 - Full Stack', apr:0.0625, may:0.375, jun:0},
-  {name:'Vivek Kumar Singh', title:'Team Lead - Full stack', apr:0, may:0.625, jun:0.375},
-  {name:'Deepak Bharti', title:'Data Engineer', apr:0, may:0.375, jun:0},
-  {name:'Raman Mishra (May)', title:'SDE 1 - Mobile Developer', apr:0, may:0, jun:0},
-  {name:'Sushant Singh', title:'QA Engineer', apr:0, may:0.075, jun:0.25},
-  {name:'Manju Lata Soreng', title:'Team Lead - Full stack', apr:0, may:0, jun:0.1875},
-  {name:'Nitin Jangid', title:'Analyst - Intern', apr:0, may:0, jun:0.75},
-  {name:'Diksha Hazarika', title:'Analyst - Intern', apr:0, may:0, jun:5.2225}
+  {name:'Kandhi Omprakash', title:'SDE 3 - Full Stack', apr:19.375, may:16.125, jun:21, jul:22.75},
+  {name:'Abhijit Nair', title:'Engineering Manager', apr:22, may:19, jun:5.6875, jul:4.0625},
+  {name:'Aditi Baitule Deshpande', title:'Sr. Project Manager', apr:4, may:18.9375, jun:16.625, jul:0},
+  {name:'Bhushan Anilrao Barbuddhe', title:'Team Lead', apr:5.3125, may:1.1875, jun:12.4375, jul:20.125},
+  {name:'Brahmjyot Singh', title:'Product Analyst', apr:1, may:0.1875, jun:5.125, jul:21.5},
+  {name:'Suraj Singh', title:'SDE 1 - Full Stack', apr:2.875, may:12.6875, jun:7.8125, jul:3.0625},
+  {name:'Shweta Singh', title:'Sr. Project Manager', apr:6.9375, may:5.375, jun:4.1875, jul:4.5625},
+  {name:'Diksha Hazarika', title:'Analyst - Intern', apr:0, may:0, jun:5.2225, jul:14.7075},
+  {name:'Harshdeep Singh Mokha', title:'Sr. Project Manager', apr:3.8438, may:5, jun:8.9688, jul:1.9375},
+  {name:'Nitin Jangid', title:'Analyst - Intern', apr:0, may:0, jun:0.75, jul:18.6875},
+  {name:'Anup Kumar Srivastav', title:'Team Lead - Full stack', apr:6.625, may:3.5125, jun:2.4062, jul:5.9375},
+  {name:'Fahimuddin Sayyed', title:'Project Analyst', apr:7.5625, may:3.1875, jun:3.3125, jul:3.9375},
+  {name:'Krishna Maheshwari', title:'Associate Project Manager', apr:2.8125, may:3.1875, jun:3.6875, jul:6.2188},
+  {name:'Abhishek Prajapati', title:'Flutter Developer - Intern', apr:4.0375, may:2.6875, jun:1, jul:8.125},
+  {name:'Ritesh Negi', title:'Data Analyst', apr:4.6875, may:3.9375, jun:1.25, jul:4.125},
+  {name:'Pranati Tiwari', title:'Associate Project Manager', apr:3.5938, may:2.6563, jun:2.6313, jul:2.8438},
+  {name:'Nandita Sharma', title:'Analyst', apr:0, may:0, jun:0, jul:11.5},
+  {name:'Kashish Talwani', title:'Associate Project Manager', apr:2.375, may:4.0625, jun:2.5, jul:1.625},
+  {name:'Aditya  Goswami', title:'Associate Product Manager', apr:0, may:0, jun:0, jul:10.5625},
+  {name:'Vanshika Sehgal', title:'SDE 1 - Full Stack', apr:2.5, may:3.3125, jun:1.5625, jul:3},
+  {name:'Sachin Sharma', title:'Data Engineer', apr:2, may:1.25, jun:0.25, jul:6},
+  {name:'Samarth Paul', title:'Associate Project Manager', apr:2, may:2.2813, jun:2.8438, jul:1.9375},
+  {name:'Sachin Vinod Rathod', title:'QA Engineer', apr:2.8125, may:3.8125, jun:0.8125, jul:1.5625},
+  {name:'Devang Bhatnagar', title:'SDE 1 - Frappe', apr:1.6188, may:3.15, jun:1.5938, jul:2.375},
+  {name:'Shrey Jain', title:'Team Lead', apr:3.7813, may:2.1313, jun:1.0938, jul:1.5625},
+  {name:'Mayur Sharma', title:'Associate Project Manager', apr:0.75, may:3.2563, jun:3.4688, jul:1.025},
+  {name:'Pooja Srivastava', title:'Project Analyst', apr:1.75, may:1.4063, jun:3.1875, jul:1.5},
+  {name:'Pragat Singh', title:'Team Lead - Java', apr:2.25, may:3.625, jun:0, jul:0},
+  {name:'Amit Negi', title:'SDE 1 - PHP', apr:0, may:0, jun:0, jul:5.6833},
+  {name:'Navneet Patteri', title:'SDE 1 - Frappe', apr:0.9375, may:1.5, jun:0.9375, jul:2.1562},
+  {name:'Samarth Rana', title:'Project Analyst', apr:1, may:2.9125, jun:1.5, jul:0},
+  {name:'Namandeep', title:'Project Analyst', apr:0.3125, may:0.4375, jun:2.75, jul:0.8125},
+  {name:'Tabseer Khan', title:'Data Engineer', apr:0.8125, may:3.25, jun:0.125, jul:0},
+  {name:'Akshat Verma', title:'Product Analyst', apr:3.5625, may:0.125, jun:0.125, jul:0},
+  {name:'Sureshkumar Mali', title:'Team Lead - Full stack', apr:2.9, may:0.6875, jun:0.1062, jul:0},
+  {name:'Sparsh Verma', title:'SDE 1 - Frappe', apr:3.375, may:0, jun:0.3125, jul:0},
+  {name:'Bhanu Prakash', title:'SDE 1 - Full Stack', apr:0.0625, may:0.375, jun:0, jul:3},
+  {name:'Manju Lata Soreng', title:'Team Lead - Full stack', apr:0, may:0, jun:0.1875, jul:3.0938},
+  {name:'Aastha Arora', title:'Sr. Project Manager', apr:0.125, may:0, jun:1.625, jul:1.5},
+  {name:'Deepak Bharti', title:'Data Engineer', apr:0, may:0.375, jun:0, jul:2.875},
+  {name:'Raman Mishra', title:'SDE 1 - Mobile Developer', apr:2.5, may:0.375, jun:0, jul:0.125},
+  {name:'Nadge Sachin Laxi', title:'SDE 1 - Backend', apr:0, may:3, jun:0, jul:0},
+  {name:'Dalbeer Kaur', title:'Sr. QA Engineer', apr:0.875, may:2.0625, jun:0, jul:0},
+  {name:'Himanshi Sharma', title:'Sr. Project Manager', apr:0.875, may:1, jun:0, jul:0.9688},
+  {name:'Rohit Singh (Sr.)', title:'Sr. Data Engineer', apr:0.5625, may:0.6875, jun:1.5625, jul:0},
+  {name:'Vishwa Patel', title:'Engagement Manager', apr:2.1875, may:0, jun:0.0625, jul:0},
+  {name:'Bhanu Marwah', title:'Data Engineer', apr:1.0563, may:0.5563, jun:0.25, jul:0.375},
+  {name:'Harshit Sodhani', title:'SDE 1 - Full Stack', apr:1.0688, may:0.5313, jun:0.1875, jul:0.2812},
+  {name:'Arpita Jain', title:'Project Manager', apr:0.375, may:0.375, jun:0.125, jul:1.1875},
+  {name:'Rohit SIngh (Intern)', title:'Frappe - Intern', apr:1.875, may:0, jun:0, jul:0},
+  {name:'Aman Sharma', title:'Project Analyst', apr:0.375, may:0, jun:0, jul:1.375},
+  {name:'Rohit Singh', title:'Sr. Data Engineer', apr:0, may:0, jun:0, jul:1.25},
+  {name:'Amandeep Singh', title:'Sr. QA Engineer', apr:0.25, may:0.4375, jun:0.25, jul:0.25},
+  {name:'Sunchay Singhal', title:'Project Analyst - Consultant', apr:0.125, may:0.5, jun:0, jul:0.5},
+  {name:'Aryan Khanna', title:'Analyst', apr:0, may:0, jun:0, jul:1.125},
+  {name:'Chitranshi Jain', title:'Project Analyst', apr:0.8125, may:0.125, jun:0, jul:0.125},
+  {name:'Vivek Kumar Singh', title:'Team Lead - Full stack', apr:0, may:0.625, jun:0.375, jul:0},
+  {name:'Arvind Bansode', title:'Sr. Project Manager', apr:0, may:0, jun:0, jul:1},
+  {name:'Hrushikesh Deodhar', title:'SDE 1 - PHP', apr:0.4375, may:0.25, jun:0.1875, jul:0},
+  {name:'Nagesh Kashinath Koli', title:'Project Analyst', apr:0.8125, may:0, jun:0, jul:0},
+  {name:'Aditya Gore', title:'Team Lead - Full stack', apr:0.375, may:0, jun:0, jul:0},
+  {name:'Archana Sidram Gentyal', title:'Pre-Sales Associate', apr:0, may:0, jun:0, jul:0.375},
+  {name:'Sushant Singh', title:'QA Engineer', apr:0, may:0.075, jun:0.25, jul:0},
+  {name:'Ankit Yadav', title:'SDE 1 - PHP', apr:0.25, may:0.0625, jun:0, jul:0},
+  {name:'Fahad', title:'SDE 2 - Backend', apr:0.25, may:0, jun:0, jul:0},
+  {name:'Hrushikesh Ramchandra Deodhar', title:'SDE 1 - PHP', apr:0, may:0, jun:0, jul:0.125},
+  {name:'Raman Mishra (May)', title:'SDE 1 - Mobile Developer', apr:0, may:0, jun:0, jul:0}
 ];
-DATA = DATA.filter(function(e){return e.apr>0||e.may>0||e.jun>0;});
+DATA = DATA.filter(function(e){return e.apr>0||e.may>0||e.jun>0||e.jul>0;});
 
 var ACT_APR={
   'Meetings & Discussions': 76.019+22.413,
@@ -323,7 +333,20 @@ var ACT_JUN={
   'Config / Docs': 0.25
 };
 
-var curFilter='both', tSortCol='jun', tSortDir='desc';
+var ACT_JUL={
+  'Meetings & Discussions': 98.3508,
+  'Employee Onboarding': 40.5675,
+  'Software - POC': 28.9375,
+  'Bench': 20,
+  'KRA': 17.2812,
+  'Dhwani Events': 4.8413,
+  'Field Visit': 1.5,
+  'Interviews': 1.0625,
+  'Demo': 0.625,
+  'Common Code/Standards': 0.25
+};
+
+var curFilter='both', tSortCol='jul', tSortDir='desc';
 
 // Activity doughnut
 var actInst=null;
@@ -332,12 +355,14 @@ function buildActChart(){
   if(curFilter==='apr'){data=ACT_APR;total=144.65;title='Activity Breakdown — April 2026';}
   else if(curFilter==='may'){data=ACT_MAY;total=146.28;title='Activity Breakdown — May 2026';}
   else if(curFilter==='jun'){data=ACT_JUN;total=130.34;title='Activity Breakdown — June 2026';}
+  else if(curFilter==='jul'){data=ACT_JUL;total=213.42;title='Activity Breakdown — July 2026';}
   else{
     var c={};
     Object.keys(ACT_APR).forEach(function(k){c[k]=(c[k]||0)+ACT_APR[k];});
     Object.keys(ACT_MAY).forEach(function(k){c[k]=(c[k]||0)+ACT_MAY[k];});
     Object.keys(ACT_JUN).forEach(function(k){c[k]=(c[k]||0)+ACT_JUN[k];});
-    data=c;total=421.27;title='Activity Breakdown — All Months';
+    Object.keys(ACT_JUL).forEach(function(k){c[k]=(c[k]||0)+ACT_JUL[k];});
+    data=c;total=634.68;title='Activity Breakdown — All Months';
   }
   var labels=Object.keys(data).filter(function(k){return data[k]>0;}).sort(function(a,b){return data[b]-data[a];});
   var vals=labels.map(function(k){return Math.round(data[k]*100)/100;});
@@ -357,15 +382,16 @@ function buildActChart(){
 new Chart(document.getElementById('compareChart'),{
   type:'bar',
   data:{
-    labels:['Meetings &\nDiscussions','Software\nPOC','Employee\nOnboarding','Common\nCode','Dhwani\nEvents','Field\nVisit','Bench'],
+    labels:[['Meetings &','Discussions'],['Software','POC'],['Employee','Onboarding'],'Bench','KRA',['Dhwani','Events'],['Field','Visit'],['Common','Code']],
     datasets:[
-      {label:'April 2026',data:[98.43,23.44,6.25,3.63,3.0,3.0,1.13],backgroundColor:BL+'cc',borderRadius:4,borderSkipped:false},
-      {label:'May 2026',  data:[94.13,33.44,0.88,0.28,9.22,5.13,0.75],backgroundColor:OR+'cc',borderRadius:4,borderSkipped:false},
-      {label:'June 2026', data:[69.01,30.38,4.85,0.44,4.75,3.25,11.06],backgroundColor:GR+'cc',borderRadius:4,borderSkipped:false}
+      {label:'April 2026',data:[98.43,23.44,6.25,1.13,1.78,3.0,3.0,3.63],backgroundColor:BL+'cc',borderRadius:4,borderSkipped:false},
+      {label:'May 2026',  data:[94.13,33.44,0.88,0.75,0.91,9.22,5.13,0.28],backgroundColor:OR+'cc',borderRadius:4,borderSkipped:false},
+      {label:'June 2026', data:[69.01,30.38,4.85,11.06,4.75,4.75,3.25,0.44],backgroundColor:GR+'cc',borderRadius:4,borderSkipped:false},
+      {label:'July 2026', data:[98.35,28.94,40.57,20.0,17.28,4.84,1.5,0.25],backgroundColor:RE+'cc',borderRadius:4,borderSkipped:false}
     ]},
   options:{responsive:true,maintainAspectRatio:true,
     plugins:{legend:{position:'top',labels:{boxWidth:12,font:{size:12}}}},
-    scales:{x:{grid:{color:GRID},ticks:{font:{size:10},maxRotation:0}},y:{grid:{color:GRID},beginAtZero:true,title:{display:true,text:'Days'}}}}
+    scales:{x:{grid:{color:GRID},ticks:{font:{size:9},maxRotation:0,autoSkip:false}},y:{grid:{color:GRID},beginAtZero:true,title:{display:true,text:'Days'}}}}
 });
 
 // Top chart
@@ -375,9 +401,10 @@ function buildTopChart(){
   if(curFilter==='apr'){sorted=DATA.slice().sort(function(a,b){return b.apr-a.apr;}).slice(0,15);title='Top 15 — April 2026';}
   else if(curFilter==='may'){sorted=DATA.slice().sort(function(a,b){return b.may-a.may;}).slice(0,15);title='Top 15 — May 2026';}
   else if(curFilter==='jun'){sorted=DATA.slice().sort(function(a,b){return b.jun-a.jun;}).slice(0,15);title='Top 15 — June 2026';}
-  else{sorted=DATA.map(function(e){return{name:e.name,val:+(e.apr+e.may+e.jun).toFixed(2)};}).sort(function(a,b){return b.val-a.val;}).slice(0,15);title='Top 15 — Combined';}
+  else if(curFilter==='jul'){sorted=DATA.slice().sort(function(a,b){return b.jul-a.jul;}).slice(0,15);title='Top 15 — July 2026';}
+  else{sorted=DATA.map(function(e){return{name:e.name,val:+(e.apr+e.may+e.jun+e.jul).toFixed(2)};}).sort(function(a,b){return b.val-a.val;}).slice(0,15);title='Top 15 — Combined';}
   var labels=sorted.map(function(e){var p=e.name.split(' ');return p[0]+(p[1]?' '+p[1][0]+'.':'');});
-  var vals=curFilter==='both'?sorted.map(function(e){return e.val;}):sorted.map(function(e){return curFilter==='apr'?e.apr:curFilter==='may'?e.may:e.jun;});
+  var vals=curFilter==='both'?sorted.map(function(e){return e.val;}):sorted.map(function(e){return curFilter==='apr'?e.apr:curFilter==='may'?e.may:curFilter==='jun'?e.jun:e.jul;});
   var colors=vals.map(function(v){return v>=5?(RE+'cc'):v>=2?(OR+'cc'):(GR+'cc');});
   if(topInst)topInst.destroy();
   topInst=new Chart(document.getElementById('topChart'),{
@@ -390,23 +417,23 @@ function buildTopChart(){
   document.getElementById('topTitle').textContent='Top 15 Employees — '+title;
 }
 
-// Spikes chart (static — people who increased in May)
+// Spikes chart (static — biggest June -> July risers)
 var spikes=[
-  {name:'Bhushan B.',   may:1.19,   jun:12.44},
-  {name:'Diksha H.',    may:0,      jun:5.22},
-  {name:'Brahmjyot S.', may:0.19,   jun:5.13},
-  {name:'Kandhi O.',    may:16.13,  jun:21.0},
-  {name:'Harshdeep M.', may:5.0,    jun:8.97},
-  {name:'Namandeep',    may:0.44,   jun:2.75},
-  {name:'Pooja S.',     may:1.41,   jun:3.19},
-  {name:'Aastha A.',    may:0,      jun:1.63}
+  {name:'Nitin J.',     jun:0.75,   jul:18.69},
+  {name:'Brahmjyot S.', jun:5.13,   jul:21.5},
+  {name:'Nandita S.',   jun:0,      jul:11.5},
+  {name:'Aditya G.',    jun:0,      jul:10.56},
+  {name:'Diksha H.',    jun:5.22,   jul:14.71},
+  {name:'Bhushan B.',   jun:12.44,  jul:20.13},
+  {name:'Abhishek P.',  jun:1.0,    jul:8.13},
+  {name:'Sachin S.',    jun:0.25,   jul:6.0}
 ];
 new Chart(document.getElementById('spikesChart'),{
   type:'bar',
   data:{labels:spikes.map(function(e){return e.name;}),
     datasets:[
-      {label:'May', data:spikes.map(function(e){return e.may;}),backgroundColor:OR+'cc',borderRadius:4,borderSkipped:false},
-      {label:'June',data:spikes.map(function(e){return e.jun;}),backgroundColor:RE+'cc',borderRadius:4,borderSkipped:false}
+      {label:'June',data:spikes.map(function(e){return e.jun;}),backgroundColor:GR+'cc',borderRadius:4,borderSkipped:false},
+      {label:'July',data:spikes.map(function(e){return e.jul;}),backgroundColor:RE+'cc',borderRadius:4,borderSkipped:false}
     ]},
   options:{responsive:true,maintainAspectRatio:true,
     plugins:{legend:{position:'top',labels:{boxWidth:12,font:{size:12}}},
@@ -433,7 +460,7 @@ function chgLabel(a,m){
 function sortTbl(col){
   if(tSortCol===col){tSortDir=tSortDir==='desc'?'asc':'desc';}
   else{tSortCol=col;tSortDir='desc';}
-  ['name','apr','may','jun','total','chg'].forEach(function(c){
+  ['name','apr','may','jun','jul','total','chg'].forEach(function(c){
     var el=document.getElementById('th-'+c);
     if(!el)return;
     el.className=(c===tSortCol?'sort-active sort-'+tSortDir:'');
@@ -449,10 +476,11 @@ function buildTable(){
     else if(tSortCol==='apr')   v=a.apr-b.apr;
     else if(tSortCol==='may')   v=a.may-b.may;
     else if(tSortCol==='jun')   v=a.jun-b.jun;
-    else if(tSortCol==='total') v=(a.apr+a.may+a.jun)-(b.apr+b.may+b.jun);
+    else if(tSortCol==='jul')   v=a.jul-b.jul;
+    else if(tSortCol==='total') v=(a.apr+a.may+a.jun+a.jul)-(b.apr+b.may+b.jun+b.jul);
     else if(tSortCol==='chg'){
-      var ca=a.may>0?(a.jun-a.may)/a.may:(a.jun>0?1:0);
-      var cb=b.may>0?(b.jun-b.may)/b.may:(b.jun>0?1:0);
+      var ca=a.jun>0?(a.jul-a.jun)/a.jun:(a.jul>0?1:0);
+      var cb=b.jun>0?(b.jul-b.jun)/b.jun:(b.jul>0?1:0);
       v=ca-cb;
     }
     return tSortDir==='desc'?-v:v;
@@ -460,9 +488,10 @@ function buildTable(){
   var maxA=Math.max.apply(null,DATA.map(function(e){return e.apr;}))||1;
   var maxM=Math.max.apply(null,DATA.map(function(e){return e.may;}))||1;
   var maxJ=Math.max.apply(null,DATA.map(function(e){return e.jun;}))||1;
+  var maxL=Math.max.apply(null,DATA.map(function(e){return e.jul;}))||1;
   var html='';
   rows.forEach(function(e,idx){
-    var tot=+(e.apr+e.may+e.jun).toFixed(2);
+    var tot=+(e.apr+e.may+e.jun+e.jul).toFixed(2);
     html+='<tr>';
     html+='<td style="color:var(--muted);font-size:12px;">'+(idx+1)+'</td>';
     html+='<td style="font-weight:600">'+e.name+'</td>';
@@ -470,21 +499,22 @@ function buildTable(){
     html+='<td><div class="pb-wrap"><div class="pb"><div class="fill" style="width:'+Math.round(e.apr/maxA*100)+'%;background:'+BL+'"></div></div><span style="font-size:12px;color:var(--text);min-width:36px;text-align:right">'+e.apr.toFixed(2)+'</span></div></td>';
     html+='<td><div class="pb-wrap"><div class="pb"><div class="fill" style="width:'+Math.round(e.may/maxM*100)+'%;background:'+OR+'"></div></div><span style="font-size:12px;color:var(--text);min-width:36px;text-align:right">'+e.may.toFixed(2)+'</span></div></td>';
     html+='<td><div class="pb-wrap"><div class="pb"><div class="fill" style="width:'+Math.round(e.jun/maxJ*100)+'%;background:'+GR+'"></div></div><span style="font-size:12px;color:var(--text);min-width:36px;text-align:right">'+e.jun.toFixed(2)+'</span></div></td>';
+    html+='<td><div class="pb-wrap"><div class="pb"><div class="fill" style="width:'+Math.round(e.jul/maxL*100)+'%;background:'+RE+'"></div></div><span style="font-size:12px;color:var(--text);min-width:36px;text-align:right">'+e.jul.toFixed(2)+'</span></div></td>';
     html+='<td style="font-weight:600">'+tot+'</td>';
-    html+='<td>'+chgLabel(e.may,e.jun)+'</td>';
-    html+='<td>'+alertBadge(e.jun)+'</td>';
+    html+='<td>'+chgLabel(e.jun,e.jul)+'</td>';
+    html+='<td>'+alertBadge(e.jul)+'</td>';
     html+='</tr>';
   });
   document.getElementById('tBody').innerHTML=html;
   var lbl=tSortDir==='desc'?'↓ high to low':'↑ low to high';
-  var f=curFilter==='both'?'All Months':curFilter==='apr'?'April 2026':curFilter==='may'?'May 2026':'June 2026';
+  var f=curFilter==='both'?'All Months':curFilter==='apr'?'April 2026':curFilter==='may'?'May 2026':curFilter==='jun'?'June 2026':'July 2026';
   document.getElementById('tCaption').textContent='Sorted by '+tSortCol+' ('+lbl+') · '+f;
 }
 
 function setFilter(f){
   curFilter=f;
-  ['both','apr','may','jun'].forEach(function(k){document.getElementById('fbtn-'+k).className='fbtn'+(k===f?' act-'+k:'');});
-  document.getElementById('fNote').textContent='Showing: '+(f==='both'?'All Months':f==='apr'?'April 2026':f==='may'?'May 2026':'June 2026');
+  ['both','apr','may','jun','jul'].forEach(function(k){document.getElementById('fbtn-'+k).className='fbtn'+(k===f?' act-'+k:'');});
+  document.getElementById('fNote').textContent='Showing: '+(f==='both'?'All Months':f==='apr'?'April 2026':f==='may'?'May 2026':f==='jun'?'June 2026':'July 2026');
   buildActChart();
   buildTopChart();
   buildTable();
@@ -641,6 +671,56 @@ var CROSS_JUN = [
   {name:'Diksha Hazarika', title:'Analyst - Intern', mtg:1.125,poc:0,bench:0,onboard:4.0975,code:0,events:0,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0}
 ];
 
+var CROSS_JUL = [
+  {name:'Kandhi Omprakash', title:'SDE 3 - Full Stack', mtg:0,poc:22.75,bench:0,onboard:0,code:0,events:0,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Brahmjyot Singh', title:'Analyst', mtg:3.5625,poc:0,bench:0,onboard:0.125,code:0,events:0,visit:1,kra:16.8125,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Bhushan Anilrao Barbuddhe', title:'Team Lead', mtg:0.1875,poc:0,bench:19.75,onboard:0,code:0,events:0.125,visit:0,kra:0,mgmt:0,demo:0,intv:0.0625,cfg:0},
+  {name:'Nitin Jangid', title:'Analyst - Intern', mtg:0,poc:0,bench:0,onboard:18.6875,code:0,events:0,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Diksha Hazarika', title:'Analyst - Intern', mtg:5.7675,poc:0,bench:0,onboard:8.63,code:0,events:0.185,visit:0,kra:0,mgmt:0,demo:0.125,intv:0,cfg:0},
+  {name:'Nandita Sharma', title:'Analyst', mtg:0.875,poc:0,bench:0,onboard:10.375,code:0,events:0,visit:0,kra:0,mgmt:0,demo:0.25,intv:0,cfg:0},
+  {name:'Aditya  Goswami', title:'Associate Product Manager', mtg:8.9375,poc:1.125,bench:0,onboard:0.375,code:0,events:0,visit:0,kra:0,mgmt:0,demo:0,intv:0.125,cfg:0},
+  {name:'Abhishek Prajapati', title:'Flutter Developer - Intern', mtg:7.8125,poc:0,bench:0,onboard:0,code:0,events:0.3125,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Krishna Maheshwari', title:'Associate Project Manager', mtg:6.2188,poc:0,bench:0,onboard:0,code:0,events:0,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Sachin Sharma', title:'Data Engineer', mtg:5.75,poc:0,bench:0,onboard:0,code:0,events:0.25,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Anup Kumar Srivastav', title:'Team Lead - Full stack', mtg:5.9375,poc:0,bench:0,onboard:0,code:0,events:0,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Amit Negi', title:'SDE 1 - PHP', mtg:5.6833,poc:0,bench:0,onboard:0,code:0,events:0,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Shweta Singh', title:'Sr. Project Manager', mtg:4.0625,poc:0,bench:0,onboard:0,code:0,events:0.25,visit:0,kra:0,mgmt:0,demo:0,intv:0.25,cfg:0},
+  {name:'Ritesh Negi', title:'Data Analyst', mtg:2.4375,poc:1.4375,bench:0.25,onboard:0,code:0,events:0,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Abhijit Nair', title:'Engineering Manager', mtg:4.0625,poc:0,bench:0,onboard:0,code:0,events:0,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Fahimuddin Sayyed', title:'Associate Project Manager', mtg:3.5,poc:0.375,bench:0,onboard:0,code:0,events:0.0625,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Manju Lata Soreng', title:'Team Lead - Full stack', mtg:3.0938,poc:0,bench:0,onboard:0,code:0,events:0,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Suraj Singh', title:'SDE 1 - Full Stack', mtg:0.4375,poc:2.375,bench:0,onboard:0,code:0,events:0.25,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Bhanu Prakash', title:'SDE 1 - Full Stack', mtg:2.875,poc:0,bench:0,onboard:0,code:0,events:0.125,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Vanshika Sehgal', title:'SDE 1 - Full Stack', mtg:2.75,poc:0,bench:0,onboard:0,code:0.25,events:0,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Deepak Bharti', title:'Data Engineer', mtg:2.875,poc:0,bench:0,onboard:0,code:0,events:0,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Pranati Tiwari', title:'Associate Project Manager', mtg:2.7188,poc:0,bench:0,onboard:0,code:0,events:0.125,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Devang Bhatnagar', title:'SDE 1 - Frappe', mtg:2.125,poc:0.25,bench:0,onboard:0,code:0,events:0,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Navneet Patteri', title:'SDE 1 - Frappe', mtg:2.1562,poc:0,bench:0,onboard:0,code:0,events:0,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Harshdeep Singh Mokha', title:'Sr. Project Manager', mtg:1.0625,poc:0,bench:0,onboard:0,code:0,events:0.875,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Samarth Paul', title:'Associate Project Manager', mtg:1.8125,poc:0,bench:0,onboard:0,code:0,events:0.125,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Kashish Talwani', title:'Associate Project Manager', mtg:1.375,poc:0,bench:0,onboard:0,code:0,events:0,visit:0,kra:0,mgmt:0,demo:0.25,intv:0,cfg:0},
+  {name:'Sachin Vinod Rathod', title:'QA Engineer', mtg:1.4375,poc:0,bench:0,onboard:0,code:0,events:0.125,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Shrey Jain', title:'Team Lead', mtg:1.4375,poc:0,bench:0,onboard:0,code:0,events:0.125,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Aastha Arora', title:'Sr. Project Manager', mtg:1.5,poc:0,bench:0,onboard:0,code:0,events:0,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Pooja Srivastava', title:'Analyst', mtg:1.3125,poc:0,bench:0,onboard:0,code:0,events:0.1875,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Aman Sharma', title:'Analyst', mtg:1.125,poc:0,bench:0,onboard:0,code:0,events:0.25,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Rohit Singh', title:'Sr. Data Engineer', mtg:0.5,poc:0.625,bench:0,onboard:0,code:0,events:0.125,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Arpita Jain', title:'Project Manager', mtg:0.5625,poc:0,bench:0,onboard:0,code:0,events:0,visit:0,kra:0,mgmt:0,demo:0,intv:0.625,cfg:0},
+  {name:'Aryan Khanna', title:'Analyst', mtg:0,poc:0,bench:0,onboard:1,code:0,events:0.125,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Mayur Sharma', title:'Associate Project Manager', mtg:1.025,poc:0,bench:0,onboard:0,code:0,events:0,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Arvind Bansode', title:'Sr. Project Manager', mtg:0,poc:0,bench:0,onboard:1,code:0,events:0,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Himanshi Sharma', title:'Sr. Project Manager', mtg:0.375,poc:0,bench:0,onboard:0,code:0,events:0.125,visit:0,kra:0.4688,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Namandeep', title:'Sr. Analyst', mtg:0.25,poc:0,bench:0,onboard:0,code:0,events:0.0625,visit:0.5,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Sunchay Singhal', title:'Analyst', mtg:0.25,poc:0,bench:0,onboard:0,code:0,events:0.25,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Bhanu Marwah', title:'Data Engineer', mtg:0.25,poc:0,bench:0,onboard:0,code:0,events:0.125,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Archana Sidram Gentyal', title:'Pre-Sales Associate', mtg:0,poc:0,bench:0,onboard:0.375,code:0,events:0,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Harshit Sodhani', title:'SDE 1 - Full Stack', mtg:0,poc:0,bench:0,onboard:0,code:0,events:0.2812,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Amandeep Singh', title:'Sr. QA Engineer', mtg:0,poc:0,bench:0,onboard:0,code:0,events:0.25,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Hrushikesh Ramchandra Deodhar', title:'SDE 1 - PHP', mtg:0.125,poc:0,bench:0,onboard:0,code:0,events:0,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Chitranshi Jain', title:'Analyst', mtg:0.125,poc:0,bench:0,onboard:0,code:0,events:0,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0},
+  {name:'Raman Mishra', title:'SDE 1 -  Mobile Developer', mtg:0,poc:0,bench:0,onboard:0,code:0,events:0.125,visit:0,kra:0,mgmt:0,demo:0,intv:0,cfg:0}
+];
+
 var CROSS_COLS = [
   {key:'mtg',    label:'Meetings'},
   {key:'poc',    label:'POC'},
@@ -659,14 +739,14 @@ var CROSS_COLS = [
 var crossSortCol='total', crossSortDir='desc';
 
 function buildCrossTab(){
-  var src = curFilter==='apr' ? CROSS_APR : curFilter==='may' ? CROSS_MAY : curFilter==='jun' ? CROSS_JUN : null;
-  var label = curFilter==='apr'?'April 2026':curFilter==='may'?'May 2026':curFilter==='jun'?'June 2026':'All Months';
+  var src = curFilter==='apr' ? CROSS_APR : curFilter==='may' ? CROSS_MAY : curFilter==='jun' ? CROSS_JUN : curFilter==='jul' ? CROSS_JUL : null;
+  var label = curFilter==='apr'?'April 2026':curFilter==='may'?'May 2026':curFilter==='jun'?'June 2026':curFilter==='jul'?'July 2026':'All Months';
 
-  // For 'both', merge APR + MAY + JUN
+  // For 'both', merge APR + MAY + JUN + JUL
   var rows;
   if(!src){
     var map={};
-    [CROSS_APR,CROSS_MAY,CROSS_JUN].forEach(function(SET){
+    [CROSS_APR,CROSS_MAY,CROSS_JUN,CROSS_JUL].forEach(function(SET){
       SET.forEach(function(e){
         if(!map[e.name]) map[e.name]={name:e.name,title:e.title};
         CROSS_COLS.forEach(function(c){map[e.name][c.key]=(map[e.name][c.key]||0)+(e[c.key]||0);});
